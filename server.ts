@@ -24,7 +24,7 @@ async function startServer() {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  // Gemini AI Bhajan Search & Lyrics Extraction Endpoint
+  // Gemini AI Bhajan Search & Lyrics Extraction Endpoint with Multi-Model Fallback & Retry
   app.post('/api/gemini/generate-bhajan', async (req, res) => {
     try {
       const { prompt, category, languageHint } = req.body;
@@ -40,54 +40,69 @@ async function startServer() {
 4. रचयिता/संत का नाम तथा उपयुक्त राग/स्केल (उदा. राग भैरवी / C# Scale / दादरा ताल / कहरवा ताल) स्पष्ट रूप से बताएं।
 5. 1-2 पंक्तियों में सुंदर भावार्थ व महात्म्य दें।`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.7-flash',
-        contents: `खोजें और पूरी प्रामाणिक लिरिक्स दें भजन की: "${prompt.trim()}" ${category && category !== 'All' ? `(श्रेणी संदर्भ: ${category})` : ''} ${languageHint ? `(भाषा: ${languageHint})` : ''}`,
-        config: {
-          systemInstruction,
-          responseMimeType: 'application/json',
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              hindiTitle: {
-                type: Type.STRING,
-                description: 'भजन का शुद्ध हिंदी शीर्षक (देवनागरी में)',
-              },
-              gujaratiTitle: {
-                type: Type.STRING,
-                description: 'ભજનનું ગુજરાતી શીર્ષક (જો લાગુ હોય તો ગુજરાતી લિપિમાં)',
-              },
-              category: {
-                type: Type.STRING,
-                description: 'श्रेणी (Hanumanji, Ramji, Sunderkand Stuti & Doha, Aarti, Thal, Dhoon, Shivji, Krishna में से एक)',
-              },
-              composer: {
-                type: Type.STRING,
-                description: 'रचयिता या संत या पारंपरिक गायक का नाम',
-              },
-              ragaOrScale: {
-                type: Type.STRING,
-                description: 'संगीत का राग, स्केल व ताल (उदा. राग भैरवी / C# Scale / कहरवा ताल)',
-              },
-              description: {
-                type: Type.STRING,
-                description: 'भजन का संक्षिप्त भावार्थ या महात्म्य (1-2 वाक्य)',
-              },
-              lyrics: {
-                type: Type.STRING,
-                description: 'भजन के पूरे प्रामाणिक बोल (स्थायी, सभी अंतरे, दोहा, चौपाई आदि स्पष्ट व सुव्यवस्थित पंक्तियों में)',
-              },
-            },
-            required: ['hindiTitle', 'category', 'lyrics'],
-          },
-        },
-      });
+      const contents = `भजन का नाम/बोल पहचानें और उसकी पूरी प्रामाणिक लिरिक्स दें: "${prompt.trim()}" ${category && category !== 'All' ? `(श्रेणी: ${category})` : ''} ${languageHint ? `(भाषा: ${languageHint})` : ''}`;
 
-      const parsed = JSON.parse(response.text || '{}');
-      return res.json({ success: true, bhajan: parsed });
+      const schemaConfig = {
+        systemInstruction,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            hindiTitle: {
+              type: Type.STRING,
+              description: 'भजन का शुद्ध शीर्षक (हिंदी/देवनागरी में)',
+            },
+            category: {
+              type: Type.STRING,
+              description: 'श्रेणी (Hanumanji, Ramji, Sunderkand Stuti & Doha, Aarti, Thal, Dhoon, Shivji, Krishna में से सबसे उपयुक्त)',
+            },
+            lyrics: {
+              type: Type.STRING,
+              description: 'भजन के संपूर्ण बोल (स्थायी, सभी अंतरे, दोहा व चौपाई क्रमबद्ध पंक्तियों में)',
+            },
+          },
+          required: ['hindiTitle', 'category', 'lyrics'],
+        },
+      };
+
+      // Reliable Google GenAI model fallback cascade
+      const candidateModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      let lastError: any = null;
+      let parsedResult: any = null;
+
+      for (const modelName of candidateModels) {
+        try {
+          const response = await ai.models.generateContent({
+            model: modelName,
+            contents,
+            config: schemaConfig,
+          });
+
+          if (response.text) {
+            parsedResult = JSON.parse(response.text);
+            if (parsedResult.hindiTitle && parsedResult.lyrics) {
+              break;
+            }
+          }
+        } catch (err: any) {
+          lastError = err;
+          console.warn(`Gemini generation on model ${modelName} encountered: ${err?.message || err}. Trying next fallback...`);
+          await new Promise((resolve) => setTimeout(resolve, 400));
+        }
+      }
+
+      if (!parsedResult) {
+        throw lastError || new Error('भजन लिरिक्स प्राप्त नहीं हो सके।');
+      }
+
+      return res.json({ success: true, bhajan: parsedResult });
     } catch (error: any) {
       console.error('Error searching and generating bhajan with Gemini:', error);
-      return res.status(500).json({ error: error?.message || 'भजन खोजने में समस्या आई, कृपया पुनः प्रयास करें।' });
+      let userFriendlyMessage = 'भजन खोजने में समस्या आई, कृपया मैन्युअल रूप से "नया भजन जोड़ें" बटन से जोड़ें।';
+      if (error?.message?.includes('503') || error?.message?.includes('UNAVAILABLE') || error?.message?.includes('high demand')) {
+        userFriendlyMessage = 'AI सर्वर व्यस्त है। आप सीधे "नया भजन जोड़ें" पर क्लिक करके सिर्फ शीर्षक, श्रेणी और लिरिक्स डालकर भजन जोड़ सकते हैं।';
+      }
+      return res.status(500).json({ error: userFriendlyMessage, details: error?.message });
     }
   });
 

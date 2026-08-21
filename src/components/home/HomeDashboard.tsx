@@ -15,6 +15,25 @@ import {
   User
 } from 'lucide-react';
 
+// Darshan Photos for Shree Kashtabhanjan Dev Sarangpur Dham
+const SARANGPUR_DARSHAN_PHOTOS = [
+  {
+    title: 'श्री कष्टभंजन देव सारंगपुर धाम दर्शन',
+    subtitle: 'सारंगपुर धाम (Salangpur Hanumanji)',
+    url: 'https://old.salangpurhanumanji.org/uploads/MobileHanumanji497_20250915113717.jpg',
+  },
+  {
+    title: 'श्री कष्टभंजन देव दिव्य शृंगार',
+    subtitle: 'श्री कष्टभंजन देव महाराज',
+    url: 'https://old.salangpurhanumanji.org/uploads/MobileHanumanji497_20250915113717.jpg',
+  },
+  {
+    title: 'महा सुंदरकांड 108 दीप दर्शन',
+    subtitle: 'नौगामा मंडल भक्ति उत्सव',
+    url: 'https://images.unsplash.com/photo-1609358905581-e5382c16a815?auto=format&fit=crop&w=800&q=80',
+  }
+];
+
 interface HomeDashboardProps {
   onSelectCeremony?: (ceremony: SunderkandCeremony) => void;
 }

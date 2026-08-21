@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Bhajan } from '../../types';
 import { DiyaIcon, OmSymbol } from '../common/DevotionalIcons';
-import { GeminiBhajanModal } from './GeminiBhajanModal';
 import {
   Music,
   Search,
@@ -17,12 +16,9 @@ import {
   ZoomOut,
   Maximize2,
   X,
-  Sparkles,
   ChevronRight,
   Flame,
-  ExternalLink,
-  Mic,
-  ArrowRight
+  ExternalLink
 } from 'lucide-react';
 
 interface BhajanLyricsSectionProps {
@@ -37,9 +33,6 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
   const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | null>(() => {
     return initialSelectedBhajan || bhajans[0] || null;
   });
-
-  // Gemini AI Bhajan Modal State
-  const [isGeminiModalOpen, setIsGeminiModalOpen] = useState(false);
 
   // Reading settings (font size scaler for comfortable recitation!)
   const [fontSizeLevel, setFontSizeLevel] = useState<number>(2); // 0: Small (15px), 1: Normal (17px), 2: Large (20px), 3: Extra Large (24px)
@@ -183,66 +176,33 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-amber-200/80 shadow-xs">
-        <div>
-          <div className="flex items-center space-x-2 text-orange-600 font-bold text-xs uppercase tracking-wider mb-1">
-            <Music className="w-4 h-4" />
-            <span>Devotional Hymns & Kirtan Library</span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-3xl border border-amber-200/80 shadow-xs">
+        <div className="flex items-center space-x-3">
+          <div className="w-11 h-11 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+            <Music className="w-6 h-6" />
           </div>
-          <h1 className="font-serif-devotional text-2xl sm:text-3xl font-bold text-stone-900">
-            Bhajan Lyrics Sangrah
-          </h1>
-          <p className="text-xs sm:text-sm text-stone-500 mt-1">
-            Searchable collection of Hanuman Chalisa, Sunderkand Stuti, Aarti, Thal, and traditional Gujarati Bhajans.
-          </p>
+          <div>
+            <h1 className="font-serif-devotional text-xl sm:text-2xl font-bold text-stone-900">
+              भजन लिरिक्स संग्रह
+            </h1>
+            <p className="text-xs text-stone-500 font-devanagari mt-0.5">
+              हनुमान जी, राम जी, सुंदरकांड स्तुति, आरती, थाल व गुजराती भजन
+            </p>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
-          <button
-            onClick={() => setIsGeminiModalOpen(true)}
-            className="px-4 py-2.5 bg-linear-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-stone-950 text-xs sm:text-sm font-bold rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all border border-amber-300 shadow-amber-500/20"
-          >
-            <Sparkles className="w-4 h-4 text-orange-800 animate-pulse" />
-            <Mic className="w-3.5 h-3.5 text-stone-900" />
-            <span>Gemini AI (भजन खोजें व जोड़ें)</span>
-          </button>
-
-          {isAdmin && (
+        {isAdmin && (
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
             <button
               id="admin-add-bhajan-btn"
               onClick={openAddModal}
-              className="px-4 py-2.5 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-md shadow-orange-600/20 flex items-center gap-2 cursor-pointer transition-all shrink-0"
+              className="px-4 py-2.5 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-orange-600/20 flex items-center gap-2 cursor-pointer transition-all shrink-0"
             >
               <Plus className="w-4 h-4" />
-              <span>मैन्युअल जोड़ें (Manual Add)</span>
+              <span>+ नया भजन जोड़ें</span>
             </button>
-          )}
-        </div>
-      </div>
-
-      {/* Gemini AI Bhajan Search Banner Card */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-600 to-amber-600 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-amber-300">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-bold backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
-            <span>Gemini 3.7 Flash AI Bhajan Search</span>
           </div>
-          <h2 className="font-serif-devotional text-base sm:text-lg font-bold text-white">
-            कोई भी भजन खोजें और 1-क्लिक में भजन लिरिक्स में जोड़ें
-          </h2>
-          <p className="text-xs text-amber-100 font-devanagari max-w-2xl">
-            माइक से बोलकर या लिखकर भजन का नाम बताएं — Gemini AI पूरी प्रामाणिक लिरिक्स (स्थायी, अंतरे, दोहा) खोजकर आपके इस भजन संग्रह में जोड़ देगा।
-          </p>
-        </div>
-
-        <button
-          onClick={() => setIsGeminiModalOpen(true)}
-          className="px-4 py-2.5 bg-white hover:bg-amber-50 text-orange-900 text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0 self-start sm:self-auto"
-        >
-          <Mic className="w-4 h-4 text-red-600 animate-pulse" />
-          <span>भजन खोजें व लिरिक्स जोड़ें</span>
-          <ArrowRight className="w-3.5 h-3.5 text-orange-600" />
-        </button>
+        )}
       </div>
 
       {/* Category Pills & Search */}
@@ -272,11 +232,6 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && searchTerm.trim()) {
-                    setIsGeminiModalOpen(true);
-                  }
-                }}
                 placeholder="भजन, पंक्ति या शब्द खोजें..."
                 className="w-full pl-9 pr-8 py-2 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none"
               />
@@ -290,14 +245,6 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
                 </button>
               )}
             </div>
-
-            <button
-              onClick={() => setIsGeminiModalOpen(true)}
-              className="p-2 bg-amber-100 hover:bg-amber-200 text-orange-800 rounded-xl transition-colors cursor-pointer shrink-0 border border-amber-300"
-              title="Gemini AI से नया भजन खोजें व जोड़ें"
-            >
-              <Sparkles className="w-4 h-4 text-orange-600 animate-pulse" />
-            </button>
           </div>
         </div>
       </div>
@@ -374,18 +321,20 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
                   {searchTerm ? `"${searchTerm}" नहीं मिला` : 'कोई भजन नहीं मिला'}
                 </p>
                 <p className="text-xs text-stone-500 font-devanagari">
-                  Gemini AI से यह भजन तुरंत खोजकर अपनी लाइब्रेरी में जोड़ सकते हैं।
+                  खोज शब्द बदलें या नया भजन जोड़ने के लिए एडमिन से संपर्क करें।
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsGeminiModalOpen(true)}
-                className="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-xl text-xs font-bold shadow-md hover:from-orange-700 hover:to-amber-700 transition-all flex items-center justify-center gap-1.5 mx-auto cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-                <span>Gemini AI से खोजें व जोड़ें</span>
-              </button>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={openAddModal}
+                  className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5 mx-auto cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>नया भजन जोड़ें</span>
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -578,157 +527,98 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
         </div>
       )}
 
-      {/* ADMIN ADD / EDIT BHAJAN MODAL */}
+      {/* ADMIN ADD / EDIT BHAJAN MODAL (Only Title, Category, and Lyrics) */}
       {isAddEditModalOpen && isAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-amber-200">
-            <div className="bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 p-6 text-white flex items-center justify-between">
+          <div className="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-amber-200">
+            <div className="bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 p-5 sm:p-6 text-white flex items-center justify-between">
               <div>
-                <h3 className="font-serif-devotional text-xl font-bold">
-                  {editingBhajan ? 'Edit Bhajan Lyrics' : 'Add New Bhajan Lyrics'}
+                <h3 className="font-serif-devotional text-lg sm:text-xl font-bold">
+                  {editingBhajan ? 'भजन में बदलाव करें (Edit Bhajan)' : 'नया भजन जोड़ें (Add New Bhajan)'}
                 </h3>
                 <p className="text-xs text-amber-100 mt-0.5">
-                  Publish devotional hymn to the Mandal library
+                  शीर्षक, श्रेणी और भजन के बोल लिखकर सीधे संग्रह में जोड़ें
                 </p>
               </div>
               <button
                 onClick={() => setIsAddEditModalOpen(false)}
-                className="p-1.5 bg-white/20 hover:bg-white/30 rounded-full text-white transition-colors"
+                className="p-1.5 bg-white/20 hover:bg-white/30 rounded-full text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Bhajan Title (English/Hindi) *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="e.g. Kashtbhanjan Dev Mara Sankat Harjo"
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Gujarati / Devanagari Title
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.gujaratiTitle}
-                    onChange={(e) => setFormData({ ...formData, gujaratiTitle: e.target.value })}
-                    placeholder="e.g. કષ્ટભંજન દેવ મારા સંકટ હરજો"
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none font-devanagari"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Category *
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as Bhajan['category'] })}
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none"
-                  >
-                    <option value="Hanumanji">Hanumanji</option>
-                    <option value="Ramji">Ramji</option>
-                    <option value="Sunderkand Stuti & Doha">Sunderkand Stuti & Doha</option>
-                    <option value="Aarti">Aarti</option>
-                    <option value="Thal">Thal</option>
-                    <option value="Dhoon">Dhoon</option>
-                    <option value="Shivji">Shivji</option>
-                    <option value="Krishna">Krishna</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Composer / Sant
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.composer}
-                    onChange={(e) => setFormData({ ...formData, composer: e.target.value })}
-                    placeholder="e.g. Goswami Tulsidasji"
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Raga / Harmonium Scale
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.ragaOrScale}
-                    onChange={(e) => setFormData({ ...formData, ragaOrScale: e.target.value })}
-                    placeholder="e.g. Bilawal / D# Scale"
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none"
-                  />
-                </div>
-              </div>
-
+            <form onSubmit={handleFormSubmit} className="p-5 sm:p-6 space-y-4">
+              {/* 1. Bhajan Title */}
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">
-                  Complete Lyrics (with Dohas & Chaupai) *
+                <label className="block text-xs font-bold text-stone-800 mb-1.5 font-devanagari">
+                  1. भजन का नाम / शीर्षक (Bhajan Title) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="उदा. श्री कष्टभंजन देव मारा संकट हरजो / हे दुख भंजन मारुती नंदन"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 focus:bg-white outline-none font-devanagari"
+                />
+              </div>
+
+              {/* 2. Bhajan Category */}
+              <div>
+                <label className="block text-xs font-bold text-stone-800 mb-1.5 font-devanagari">
+                  2. भजन की श्रेणी (Category) <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value as Bhajan['category'] })}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 focus:bg-white outline-none"
+                >
+                  <option value="Hanumanji">Hanumanji (हनुमान जी)</option>
+                  <option value="Ramji">Ramji (श्री राम जी)</option>
+                  <option value="Sunderkand Stuti & Doha">Sunderkand Stuti & Doha (सुंदरकांड दोहा/स्तुति)</option>
+                  <option value="Aarti">Aarti (आरती)</option>
+                  <option value="Thal">Thal (थाल)</option>
+                  <option value="Dhoon">Dhoon (धून)</option>
+                  <option value="Shivji">Shivji (शिव जी)</option>
+                  <option value="Krishna">Krishna (श्री कृष्ण)</option>
+                </select>
+              </div>
+
+              {/* 3. Complete Lyrics */}
+              <div>
+                <label className="block text-xs font-bold text-stone-800 mb-1.5 font-devanagari">
+                  3. भजन के संपूर्ण बोल (Lyrics) <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   required
                   rows={10}
                   value={formData.lyrics}
                   onChange={(e) => setFormData({ ...formData, lyrics: e.target.value })}
-                  placeholder="Paste or type verses line by line..."
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none font-devanagari leading-relaxed"
+                  placeholder="भजन की स्थायी और अंतरे की पंक्तियाँ यहाँ लिखें या पेस्ट करें..."
+                  className="w-full p-3.5 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 focus:bg-white outline-none font-devanagari leading-relaxed"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">
-                  Description / Significance (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Short explanation of when to sing this bhajan"
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-stone-200">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-200">
                 <button
                   type="button"
                   onClick={() => setIsAddEditModalOpen(false)}
-                  className="px-4 py-2.5 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl"
+                  className="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl cursor-pointer"
                 >
-                  Cancel
+                  रद्द करें (Cancel)
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold rounded-xl shadow-md"
+                  className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md cursor-pointer transition-all"
                 >
-                  {editingBhajan ? 'Save Changes' : 'Publish Bhajan Lyrics'}
+                  {editingBhajan ? 'बदलाव सुरक्षित करें' : 'भजन जोड़ें (Add Bhajan)'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-      {/* Gemini AI Bhajan Creator Modal */}
-      <GeminiBhajanModal
-        isOpen={isGeminiModalOpen}
-        onClose={() => setIsGeminiModalOpen(false)}
-        onBhajanAdded={(newBhajan) => setSelectedBhajan(newBhajan)}
-      />
     </div>
   );
 };

@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Announcement } from '../../types';
 import { DiyaIcon } from '../common/DevotionalIcons';
-import { GeminiBhajanModal } from '../bhajans/GeminiBhajanModal';
 import {
   ShieldCheck,
   Flame,
@@ -21,9 +20,7 @@ import {
   Database,
   RefreshCw,
   MessageSquareHeart,
-  Wallet,
-  Sparkles,
-  Mic
+  Wallet
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -46,9 +43,6 @@ export const AdminDashboard: React.FC = () => {
   } = useApp();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Gemini AI Bhajan Modal State
-  const [isGeminiModalOpen, setIsGeminiModalOpen] = useState(false);
 
   // Announcement modal
   const [isAnnModalOpen, setIsAnnModalOpen] = useState(false);
@@ -153,47 +147,11 @@ export const AdminDashboard: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           <button
-            onClick={() => setIsGeminiModalOpen(true)}
-            className="px-4 py-2.5 bg-linear-to-r from-amber-300 to-yellow-400 hover:from-amber-400 hover:to-yellow-500 text-stone-900 text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer shrink-0 border border-amber-400"
-          >
-            <Sparkles className="w-4 h-4 text-orange-700 animate-pulse" />
-            <Mic className="w-3.5 h-3.5 text-stone-900" />
-            <span>Gemini भजन AI (बोलें/लिखें)</span>
-          </button>
-
-          <button
             onClick={openAddAnnModal}
             className="px-4 py-2.5 bg-white hover:bg-amber-50 text-orange-800 text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer shrink-0"
           >
             <Bell className="w-4 h-4 text-orange-600" />
             <span>+ Post Announcement</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Gemini AI Bhajan Creator Banner for Admin */}
-      <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-amber-500 via-orange-600 to-amber-700 text-white p-6 sm:p-7 shadow-xl border-2 border-amber-300/80">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-          <div className="space-y-2">
-            <div className="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-amber-100 border border-white/20">
-              <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
-              <span>✨ Gemini 3.7 Flash AI Bhajan Writer</span>
-            </div>
-            <h2 className="font-serif-devotional text-xl sm:text-2xl font-bold text-white">
-              बोलकर या लिखकर भजन बनाएं — सीधे भजन संग्रह में जुड़ेगा
-            </h2>
-            <p className="text-xs sm:text-sm text-amber-100/95 max-w-2xl leading-relaxed font-devanagari">
-              एडमिन माइक ऑन करके कोई भी भजन का मुखड़ा या नाम बोलें अथवा लिखें। Gemini AI संपूर्ण शुद्ध दोहा, चौपाई, स्थायी व अंतरा तैयार करके तुरंत आपके भजन टैब व क्लाउड डेटाबेस में जोड़ देगा।
-            </p>
-          </div>
-
-          <button
-            onClick={() => setIsGeminiModalOpen(true)}
-            className="px-5 py-3 bg-white hover:bg-amber-50 text-orange-900 text-sm font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center space-x-2 cursor-pointer shrink-0 hover:scale-105"
-          >
-            <Mic className="w-4 h-4 text-red-600 animate-pulse" />
-            <span>माइक व AI स्टूडियो खोलें</span>
-            <ArrowRight className="w-4 h-4 text-orange-600" />
           </button>
         </div>
       </div>
@@ -614,11 +572,6 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
       )}
-      {/* Gemini AI Bhajan Creator Modal */}
-      <GeminiBhajanModal
-        isOpen={isGeminiModalOpen}
-        onClose={() => setIsGeminiModalOpen(false)}
-      />
     </div>
   );
 };
