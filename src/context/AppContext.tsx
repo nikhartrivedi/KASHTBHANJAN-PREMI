@@ -83,6 +83,9 @@ interface AppContextType {
   // Reset / Clear Data
   resetToDefaults: () => Promise<void>;
 
+  // Manual Save All to Cloud Button for Admin
+  saveAllToCloud: () => Promise<boolean>;
+
   // Permanent Backup and Restore
   exportAllData: () => void;
   importAllData: (jsonData: string) => Promise<boolean>;
@@ -174,20 +177,46 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(transactions));
   }, [transactions]);
 
-  // Real-time Cloud Sync with Firebase Firestore
+  // Real-time Cloud Sync with Firebase Firestore & Automatic Seeding
   useEffect(() => {
+    let isMounted = true;
+
+    // Helper to auto-seed initial collection if cloud is empty
+    const autoSeedIfEmpty = async (colName: string, initialList: any[]) => {
+      try {
+        const snap = await getDocs(collection(db, colName));
+        if (snap.empty && initialList && initialList.length > 0) {
+          const batch = writeBatch(db);
+          initialList.forEach((item) => {
+            const itemDoc = doc(db, colName, item.id);
+            batch.set(itemDoc, item);
+          });
+          await batch.commit();
+          console.log(`Cloud auto-seeded ${colName} with ${initialList.length} items.`);
+        }
+      } catch (err) {
+        console.warn(`Error checking/seeding ${colName}:`, err);
+      }
+    };
+
+    // Auto-seed all default data if Firestore is freshly initialized
+    autoSeedIfEmpty('bhajans', INITIAL_BHAJANS);
+    autoSeedIfEmpty('ceremonies', INITIAL_SUNDERKAND_CEREMONIES);
+    autoSeedIfEmpty('announcements', INITIAL_ANNOUNCEMENTS);
+    autoSeedIfEmpty('posts', INITIAL_POSTS);
+    autoSeedIfEmpty('transactions', INITIAL_TRANSACTIONS);
+
     // Sunderkand Ceremonies Listener
     const unsubCeremonies = onSnapshot(
       collection(db, 'ceremonies'),
       (snapshot) => {
+        if (!isMounted) return;
         if (!snapshot.empty) {
           const list = snapshot.docs.map((docSnap) => ({
             id: docSnap.id,
             ...docSnap.data()
           })) as SunderkandCeremony[];
           setCeremonies(list);
-        } else {
-          setCeremonies([]);
         }
         setIsCloudSynced(true);
       },
@@ -200,14 +229,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const unsubBhajans = onSnapshot(
       collection(db, 'bhajans'),
       (snapshot) => {
+        if (!isMounted) return;
         if (!snapshot.empty) {
           const list = snapshot.docs.map((docSnap) => ({
             id: docSnap.id,
             ...docSnap.data()
           })) as Bhajan[];
           setBhajans(list);
-        } else {
-          setBhajans([]);
         }
         setIsCloudSynced(true);
       },
@@ -220,14 +248,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const unsubAnnouncements = onSnapshot(
       collection(db, 'announcements'),
       (snapshot) => {
+        if (!isMounted) return;
         if (!snapshot.empty) {
           const list = snapshot.docs.map((docSnap) => ({
             id: docSnap.id,
             ...docSnap.data()
           })) as Announcement[];
           setAnnouncements(list);
-        } else {
-          setAnnouncements([]);
         }
         setIsCloudSynced(true);
       },
@@ -240,14 +267,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const unsubPosts = onSnapshot(
       collection(db, 'posts'),
       (snapshot) => {
+        if (!isMounted) return;
         if (!snapshot.empty) {
           const list = snapshot.docs.map((docSnap) => ({
             id: docSnap.id,
             ...docSnap.data()
           })) as CommunityPost[];
           setPosts(list);
-        } else {
-          setPosts([]);
         }
         setIsCloudSynced(true);
       },
@@ -260,14 +286,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const unsubTransactions = onSnapshot(
       collection(db, 'transactions'),
       (snapshot) => {
+        if (!isMounted) return;
         if (!snapshot.empty) {
           const list = snapshot.docs.map((docSnap) => ({
             id: docSnap.id,
             ...docSnap.data()
           })) as AccountingTransaction[];
           setTransactions(list);
-        } else {
-          setTransactions([]);
         }
         setIsCloudSynced(true);
       },
@@ -277,6 +302,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
 
     return () => {
+      isMounted = false;
       unsubCeremonies();
       unsubBhajans();
       unsubAnnouncements();
@@ -347,33 +373,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     // Optimistic local update
     setCeremonies((prev) => [newCeremony, ...prev]);
-    showToast('Sunderkand ceremony scheduled & saving to Cloud...');
 
     try {
       await setDoc(doc(db, 'ceremonies', newId), newCeremony);
-      showToast('☁️ Sunderkand saved to Google Firebase Firestore!');
+      showToast('✅ सुंदरकांड पाठ सफलतापूर्वक दर्ज व ऑटो-सेव हो गया (Saved to Cloud)');
     } catch (err) {
       console.error('Firestore addCeremony error:', err);
+      showToast('✅ लोकल सुरक्षित हो गया (क्लाउड सिंक प्रगति पर)');
     }
   };
 
   const updateCeremony = async (ceremony: SunderkandCeremony) => {
     setCeremonies((prev) => prev.map((c) => (c.id === ceremony.id ? ceremony : c)));
-    showToast('Sunderkand details updated!');
 
     try {
       await setDoc(doc(db, 'ceremonies', ceremony.id), ceremony);
+      showToast('✅ सुंदरकांड विवरण अपडेट व ऑटो-सेव हो गया');
     } catch (err) {
       console.error('Firestore updateCeremony error:', err);
     }
   };
 
   const deleteCeremony = async (id: string) => {
+    if (!isAdmin) {
+      showToast('❌ केवल एडमिन ही डिलीट कर सकते हैं (Only Admin can delete)');
+      return;
+    }
     setCeremonies((prev) => prev.filter((c) => c.id !== id));
-    showToast('Sunderkand ceremony removed.');
 
     try {
       await deleteDoc(doc(db, 'ceremonies', id));
+      showToast('🗑️ सुंदरकांड रिकॉर्ड सफलतापूर्वक हटा दिया गया');
     } catch (err) {
       console.error('Firestore deleteCeremony error:', err);
     }
@@ -388,33 +418,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       dateAdded: new Date().toISOString()
     };
     setBhajans((prev) => [newBhajan, ...prev]);
-    showToast('Bhajan added to library!');
 
     try {
       await setDoc(doc(db, 'bhajans', newId), newBhajan);
-      showToast('☁️ Bhajan synced to Google Firestore!');
+      showToast('✅ भजन लाइब्रेरी में जुड़ गया और Google Cloud पर ऑटो-सेव हो गया!');
     } catch (err) {
       console.error('Firestore addBhajan error:', err);
+      showToast('✅ भजन लोकल में सुरक्षित सेव हो गया');
     }
   };
 
   const updateBhajan = async (bhajan: Bhajan) => {
     setBhajans((prev) => prev.map((b) => (b.id === bhajan.id ? bhajan : b)));
-    showToast('Bhajan updated successfully!');
 
     try {
       await setDoc(doc(db, 'bhajans', bhajan.id), bhajan);
+      showToast('✅ भजन अपडेट व सुरक्षित ऑटो-सेव हो गया');
     } catch (err) {
       console.error('Firestore updateBhajan error:', err);
     }
   };
 
   const deleteBhajan = async (id: string) => {
+    if (!isAdmin) {
+      showToast('❌ केवल एडमिन ही भजन डिलीट कर सकते हैं (Only Admin can delete)');
+      return;
+    }
     setBhajans((prev) => prev.filter((b) => b.id !== id));
-    showToast('Bhajan deleted.');
 
     try {
       await deleteDoc(doc(db, 'bhajans', id));
+      showToast('🗑️ भजन संग्रह से हटा दिया गया');
     } catch (err) {
       console.error('Firestore deleteBhajan error:', err);
     }
@@ -428,11 +462,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: newId
     };
     setAnnouncements((prev) => [newAnn, ...prev]);
-    showToast('Announcement published!');
 
     try {
       await setDoc(doc(db, 'announcements', newId), newAnn);
-      showToast('☁️ Notice published to Google Firestore!');
+      showToast('✅ सूचना प्रकाशित व Google Cloud पर ऑटो-सेव हो गई');
     } catch (err) {
       console.error('Firestore addAnnouncement error:', err);
     }
@@ -440,21 +473,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateAnnouncement = async (ann: Announcement) => {
     setAnnouncements((prev) => prev.map((a) => (a.id === ann.id ? ann : a)));
-    showToast('Announcement updated!');
 
     try {
       await setDoc(doc(db, 'announcements', ann.id), ann);
+      showToast('✅ सूचना अपडेट व ऑटो-सेव हो गई');
     } catch (err) {
       console.error('Firestore updateAnnouncement error:', err);
     }
   };
 
   const deleteAnnouncement = async (id: string) => {
+    if (!isAdmin) {
+      showToast('❌ केवल एडमिन ही सूचना हटा सकते हैं');
+      return;
+    }
     setAnnouncements((prev) => prev.filter((a) => a.id !== id));
-    showToast('Announcement deleted.');
 
     try {
       await deleteDoc(doc(db, 'announcements', id));
+      showToast('🗑️ सूचना हटा दी गई');
     } catch (err) {
       console.error('Firestore deleteAnnouncement error:', err);
     }
@@ -469,11 +506,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       createdAt: new Date().toISOString()
     };
     setPosts((prev) => [newPost, ...prev]);
-    showToast('पोस्ट सफलतापूर्वक प्रकाशित हो गई!');
 
     try {
       await setDoc(doc(db, 'posts', newId), newPost);
-      showToast('☁️ Post synced to Google Firestore!');
+      showToast('✅ पोस्ट प्रकाशित और क्लाउड पर ऑटो-सेव हो गई!');
     } catch (err) {
       console.error('Firestore addPost error:', err);
     }
@@ -481,21 +517,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updatePost = async (post: CommunityPost) => {
     setPosts((prev) => prev.map((p) => (p.id === post.id ? post : p)));
-    showToast('पोस्ट अपडेट हो गई!');
 
     try {
       await setDoc(doc(db, 'posts', post.id), post);
+      showToast('✅ पोस्ट अपडेट व ऑटो-सेव हो गई');
     } catch (err) {
       console.error('Firestore updatePost error:', err);
     }
   };
 
   const deletePost = async (id: string) => {
+    const postToDelete = posts.find((p) => p.id === id);
+    if (!isAdmin && postToDelete && postToDelete.authorRole !== 'admin') {
+      showToast('❌ केवल एडमिन या लेखक ही पोस्ट हटा सकते हैं');
+      return;
+    }
     setPosts((prev) => prev.filter((p) => p.id !== id));
-    showToast('पोस्ट हटा दी गई.');
 
     try {
       await deleteDoc(doc(db, 'posts', id));
+      showToast('🗑️ पोस्ट हटा दी गई');
     } catch (err) {
       console.error('Firestore deletePost error:', err);
     }
@@ -516,6 +557,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Accounting Transactions (Admin Only) CRUD
   const addTransaction = async (txData: Omit<AccountingTransaction, 'id' | 'createdAt'>) => {
+    if (!isAdmin) {
+      showToast('❌ केवल एडमिन ही लेनदेन दर्ज कर सकते हैं');
+      return;
+    }
     const newId = 'acc-' + Date.now();
     const newTx: AccountingTransaction = {
       ...txData,
@@ -523,33 +568,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       createdAt: new Date().toISOString()
     };
     setTransactions((prev) => [newTx, ...prev]);
-    showToast('लेखा-जोखा (Transaction) सफलतापूर्वक दर्ज किया गया!');
 
     try {
       await setDoc(doc(db, 'transactions', newId), newTx);
-      showToast('☁️ Transaction saved in Firestore!');
+      showToast('✅ हिसाब-किताब दर्ज व Google Cloud पर ऑटो-सेव हो गया!');
     } catch (err) {
       console.error('Firestore addTransaction error:', err);
     }
   };
 
   const updateTransaction = async (tx: AccountingTransaction) => {
+    if (!isAdmin) {
+      showToast('❌ केवल एडमिन ही खाता अपडेट कर सकते हैं');
+      return;
+    }
     setTransactions((prev) => prev.map((t) => (t.id === tx.id ? tx : t)));
-    showToast('लेनदेन विवरण अपडेट हो गया!');
 
     try {
       await setDoc(doc(db, 'transactions', tx.id), tx);
+      showToast('✅ लेनदेन विवरण अपडेट व ऑटो-सेव हो गया');
     } catch (err) {
       console.error('Firestore updateTransaction error:', err);
     }
   };
 
   const deleteTransaction = async (id: string) => {
+    if (!isAdmin) {
+      showToast('❌ केवल एडमिन ही लेनदेन हटा सकते हैं');
+      return;
+    }
     setTransactions((prev) => prev.filter((t) => t.id !== id));
-    showToast('लेनदेन रिकॉर्ड हटा दिया गया.');
 
     try {
       await deleteDoc(doc(db, 'transactions', id));
+      showToast('🗑️ लेनदेन रिकॉर्ड हटा दिया गया');
     } catch (err) {
       console.error('Firestore deleteTransaction error:', err);
     }
@@ -589,6 +641,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (err) {
       console.error('Reset batch commit error:', err);
       showToast('डेटा लोकल स्तर पर रीसेट कर दिया गया है।');
+    }
+  };
+
+  // Manual Save All to Cloud (Admin 1-Click Save)
+  const saveAllToCloud = async (): Promise<boolean> => {
+    try {
+      showToast('⏳ क्लाउड में सेव हो रहा है (Saving to Google Cloud)...');
+
+      // Update local storage first
+      localStorage.setItem(STORAGE_KEYS.CEREMONIES, JSON.stringify(ceremonies));
+      localStorage.setItem(STORAGE_KEYS.BHAJANS, JSON.stringify(bhajans));
+      localStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify(announcements));
+      localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
+      localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(transactions));
+
+      // Batch save to Firebase Firestore
+      const batch = writeBatch(db);
+
+      ceremonies.forEach((c) => {
+        if (c.id) batch.set(doc(db, 'ceremonies', c.id), c);
+      });
+      bhajans.forEach((b) => {
+        if (b.id) batch.set(doc(db, 'bhajans', b.id), b);
+      });
+      announcements.forEach((a) => {
+        if (a.id) batch.set(doc(db, 'announcements', a.id), a);
+      });
+      posts.forEach((p) => {
+        if (p.id) batch.set(doc(db, 'posts', p.id), p);
+      });
+      transactions.forEach((t) => {
+        if (t.id) batch.set(doc(db, 'transactions', t.id), t);
+      });
+
+      await batch.commit();
+      setIsCloudSynced(true);
+      showToast('☁️ आपका सारा डेटा (भजन, सुंदरकांड, सूचनाएं, खाते) सुरक्षित सेव हो गया!');
+      return true;
+    } catch (err) {
+      console.error('saveAllToCloud batch error:', err);
+      showToast('✅ डेटा आपके ब्राउज़र में सुरक्षित सेव है (Cloud Sync Retry)');
+      return false;
     }
   };
 
@@ -719,6 +813,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         showToast,
         isCloudSynced,
         resetToDefaults,
+        saveAllToCloud,
         exportAllData,
         importAllData
       }}

@@ -20,7 +20,9 @@ import {
   Database,
   RefreshCw,
   MessageSquareHeart,
-  Wallet
+  Wallet,
+  Cloud,
+  Check
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -37,12 +39,22 @@ export const AdminDashboard: React.FC = () => {
     setActiveTab,
     setIsAuthModalOpen,
     showToast,
+    saveAllToCloud,
     exportAllData,
     importAllData,
     resetToDefaults
   } = useApp();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleAdminSave = async () => {
+    setIsSaving(true);
+    await saveAllToCloud();
+    setTimeout(() => {
+      setIsSaving(false);
+    }, 1200);
+  };
 
   // Announcement modal
   const [isAnnModalOpen, setIsAnnModalOpen] = useState(false);
@@ -146,6 +158,30 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          {/* 1-Click Save All to Cloud button */}
+          <button
+            onClick={handleAdminSave}
+            disabled={isSaving}
+            className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer shrink-0 border ${
+              isSaving
+                ? 'bg-amber-100 text-amber-900 border-amber-300 animate-pulse'
+                : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white border-emerald-400 hover:scale-105'
+            }`}
+            title="वर्तमान सभी बदलावों को तुरंत क्लाउड डेटाबेस में सुरक्षित करें"
+          >
+            {isSaving ? (
+              <>
+                <Cloud className="w-4 h-4 animate-spin text-amber-800" />
+                <span>क्लाउड में सेव हो रहा है...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                <span>💾 क्लाउड में डेटा सेव करें (Save All)</span>
+              </>
+            )}
+          </button>
+
           <button
             onClick={openAddAnnModal}
             className="px-4 py-2.5 bg-white hover:bg-amber-50 text-orange-800 text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer shrink-0"
@@ -364,7 +400,38 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+          {/* Manual Save Now to Cloud Card */}
+          <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50 border-2 border-emerald-300 text-left transition-all shadow-sm hover:shadow-md flex flex-col justify-between space-y-2 group">
+            <div className="flex items-center justify-between">
+              <span className="p-2 bg-emerald-100 text-emerald-700 rounded-xl group-hover:scale-110 transition-transform">
+                <Cloud className="w-4 h-4" />
+              </span>
+              <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider bg-emerald-100 px-2 py-0.5 rounded-md">Save Now</span>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-stone-900">क्लाउड में सेव करें (Save)</h4>
+              <p className="text-xs text-stone-500 mt-0.5">सभी भजनों, पाठों व खातों को तुरंत क्लाउड में सुरक्षित करें</p>
+            </div>
+            <button
+              onClick={handleAdminSave}
+              disabled={isSaving}
+              className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-xs cursor-pointer text-center flex items-center justify-center gap-1.5"
+            >
+              {isSaving ? (
+                <>
+                  <Cloud className="w-3.5 h-3.5 animate-spin" />
+                  <span>सेव हो रहा है...</span>
+                </>
+              ) : (
+                <>
+                  <Check className="w-3.5 h-3.5" />
+                  <span>सेव करें (Save to Cloud)</span>
+                </>
+              )}
+            </button>
+          </div>
+
           {/* Download Backup */}
           <button
             onClick={exportAllData}
@@ -380,6 +447,9 @@ export const AdminDashboard: React.FC = () => {
               <h4 className="text-sm font-bold text-stone-900">डाउनलोड बैकअप (Export)</h4>
               <p className="text-xs text-stone-500 mt-0.5">सभी रिकॉर्ड्स को एक सुरक्षित .json फ़ाइल में सहेजें</p>
             </div>
+            <span className="w-full py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-xs font-semibold shadow-xs text-center block">
+              Download File (.json)
+            </span>
           </button>
 
           {/* Import Backup */}

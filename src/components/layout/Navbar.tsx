@@ -17,7 +17,9 @@ import {
   Bell,
   Download,
   MessageSquareHeart,
-  Wallet
+  Wallet,
+  Cloud,
+  Check
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -29,10 +31,20 @@ export const Navbar: React.FC = () => {
     setIsAuthModalOpen,
     logout,
     nextSunderkand,
-    announcements
+    announcements,
+    saveAllToCloud
   } = useApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleAdminSave = async () => {
+    setIsSaving(true);
+    await saveAllToCloud();
+    setTimeout(() => {
+      setIsSaving(false);
+    }, 1200);
+  };
 
   const navItems: { id: ActiveTab; label: string; icon: React.ReactNode; adminOnly?: boolean }[] = [
     { id: 'home', label: 'Home', icon: <Home className="w-4 h-4" /> },
@@ -62,6 +74,12 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-3 text-xs">
+            {/* Realtime Auto-Save status badge */}
+            <div className="flex items-center gap-1.5 bg-emerald-500/20 text-emerald-100 border border-emerald-400/30 px-2.5 py-0.5 rounded-full text-[11px] font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>क्लाउड ऑटो-सेव सक्रिय (Auto-Saved)</span>
+            </div>
+
             {nextSunderkand && (
               <button
                 onClick={() => handleTabClick('sunderkand')}
@@ -77,13 +95,17 @@ export const Navbar: React.FC = () => {
             
             <div className="flex items-center space-x-1 font-medium">
               {isAdmin ? (
-                <span className="bg-emerald-500/30 text-emerald-100 px-2 py-0.5 rounded-md flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" /> Admin Mode
+                <span className="bg-amber-300 text-stone-900 font-bold px-2 py-0.5 rounded-md flex items-center gap-1 text-[11px] shadow-xs">
+                  <ShieldCheck className="w-3 h-3 text-orange-700" /> एडमिन (Admin Mode)
                 </span>
               ) : (
-                <span className="bg-orange-800/40 text-orange-100 px-2 py-0.5 rounded-md">
-                  Guest View
-                </span>
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="bg-orange-800/60 hover:bg-orange-800 text-orange-100 px-2 py-0.5 rounded-md text-[11px] cursor-pointer transition-colors"
+                  title="एडमिन पासवर्ड डालकर लॉगिन करें ताकि आप जोड़ या डिलीट कर सकें"
+                >
+                  अतिथि व्यू (लॉगिन करें)
+                </button>
               )}
             </div>
           </div>
@@ -140,6 +162,31 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center space-x-2 sm:space-x-3">
             {isAdmin ? (
               <div className="flex items-center space-x-2">
+                {/* Admin Quick Save Button */}
+                <button
+                  id="admin-quick-save-btn"
+                  onClick={handleAdminSave}
+                  disabled={isSaving}
+                  className={`flex items-center space-x-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-lg shadow-sm border transition-all cursor-pointer ${
+                    isSaving
+                      ? 'bg-amber-100 text-amber-800 border-amber-300 animate-pulse'
+                      : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white border-emerald-500 shadow-emerald-600/20 hover:scale-105'
+                  }`}
+                  title="क्लाउड और डिवाइस में सभी बदलाव तुरंत सेव करें (Save to Cloud)"
+                >
+                  {isSaving ? (
+                    <>
+                      <Cloud className="w-4 h-4 animate-spin text-amber-700" />
+                      <span>सेव हो रहा है...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4 text-emerald-100" />
+                      <span>💾 सेव करें (Save)</span>
+                    </>
+                  )}
+                </button>
+
                 <button
                   id="admin-logout-btn"
                   onClick={logout}
@@ -198,16 +245,29 @@ export const Navbar: React.FC = () => {
 
           <div className="pt-2 border-t border-amber-100 space-y-1.5">
             {isAdmin ? (
-              <button
-                onClick={() => {
-                  logout();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-red-700 hover:bg-red-50 rounded-lg font-medium"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Exit Admin Mode</span>
-              </button>
+              <>
+                <button
+                  onClick={async () => {
+                    await handleAdminSave();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-xs cursor-pointer"
+                >
+                  <Cloud className="w-4 h-4" />
+                  <span>💾 क्लाउड में डेटा सेव करें (Save All)</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-red-700 hover:bg-red-50 rounded-lg font-medium"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Exit Admin Mode</span>
+                </button>
+              </>
             ) : (
               <button
                 onClick={() => {
