@@ -22,7 +22,8 @@ import {
   ShieldCheck,
   CalendarCheck,
   Smartphone,
-  Download
+  Download,
+  Instagram
 } from 'lucide-react';
 
 interface HomeDashboardProps {
@@ -552,6 +553,85 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({ onSelectCeremony, 
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* 6. Mandal Office, Contact & Social Section */}
+      <section className="bg-linear-to-br from-amber-500/10 via-orange-500/10 to-amber-600/10 rounded-3xl border-2 border-orange-300/80 p-6 sm:p-8 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          {/* Left info */}
+          <div className="md:col-span-7 space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-bold border border-orange-200">
+              <DiyaIcon className="w-3.5 h-3.5 text-orange-600" />
+              <span>Mandal Office & Official Contacts</span>
+            </div>
+
+            <h3 className="font-serif-devotional text-2xl font-bold text-stone-900">
+              SHREE KASHTBHANJAN PREMI
+            </h3>
+
+            <div className="flex items-start gap-2.5 text-stone-700 text-sm">
+              <MapPin className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-stone-900">Address / पता:</span>
+                <p className="text-stone-600">
+                  Riwa Kirana Store, Nougama, Banswara, Rajasthan - 327603
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <div className="flex items-center gap-2 text-sm font-bold text-stone-900 mb-2">
+                <Phone className="w-4 h-4 text-orange-600" />
+                <span>संपर्क सूत्र (Call / WhatsApp):</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href="tel:+917732943851"
+                  className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-stone-800 hover:bg-orange-50 text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
+                >
+                  <span>📞 7732943851</span>
+                </a>
+                <a
+                  href="tel:+919772114039"
+                  className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-stone-800 hover:bg-orange-50 text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
+                >
+                  <span>📞 97721 14039</span>
+                </a>
+                <a
+                  href="tel:+919636223591"
+                  className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-stone-800 hover:bg-orange-50 text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
+                >
+                  <span>📞 9636223591</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Instagram & Connect CTA */}
+          <div className="md:col-span-5 flex flex-col items-center md:items-end justify-center space-y-3 bg-white/80 backdrop-blur-xs p-5 rounded-2xl border border-orange-200 shadow-xs">
+            <div className="text-center md:text-right">
+              <span className="text-xs uppercase tracking-wider font-bold text-orange-700 block">
+                Official Social Channel
+              </span>
+              <p className="text-sm font-bold text-stone-900 mt-0.5">
+                @kastbhanjanpremi_nougama
+              </p>
+              <p className="text-xs text-stone-500 mt-1">
+                दैनिक दर्शन, सुंदरकांड वीडियो व मंडल अपडेट्स के लिए Instagram पर जुड़ें।
+              </p>
+            </div>
+
+            <a
+              href="https://www.instagram.com/kastbhanjanpremi_nougama?igsi=MWs5NHo5a3Awc2FodQ=="
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-500 hover:to-orange-400 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
+            >
+              <Instagram className="w-4 h-4" />
+              <span>Follow on Instagram</span>
+            </a>
+          </div>
         </div>
       </section>
     </div>
