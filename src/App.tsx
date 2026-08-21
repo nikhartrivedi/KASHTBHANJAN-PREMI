@@ -3,7 +3,6 @@ import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { AuthModal } from './components/auth/AuthModal';
-import { InstallApkModal } from './components/apk/InstallApkModal';
 import { HomeDashboard } from './components/home/HomeDashboard';
 import { SunderkandSection } from './components/sunderkand/SunderkandSection';
 import { BhajanLyricsSection } from './components/bhajans/BhajanLyricsSection';
@@ -23,7 +22,7 @@ import {
 } from 'lucide-react';
 
 const MainAppContent: React.FC = () => {
-  const { activeTab, setActiveTab, isAdmin, toastMessage, isApkModalOpen, setIsApkModalOpen } = useApp();
+  const { activeTab, setActiveTab, isAdmin, toastMessage } = useApp();
 
   const [selectedCeremony, setSelectedCeremony] = useState<SunderkandCeremony | undefined>(undefined);
   const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | undefined>(undefined);
@@ -145,9 +144,6 @@ const MainAppContent: React.FC = () => {
 
       {/* Authentication Modal */}
       <AuthModal />
-
-      {/* APK & App Installation Modal */}
-      <InstallApkModal isOpen={isApkModalOpen} onClose={() => setIsApkModalOpen(false)} />
 
       {/* Footer */}
       <Footer />

@@ -1,10 +1,10 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { DiyaIcon } from '../common/DevotionalIcons';
-import { Phone, MapPin, RotateCcw, Smartphone, Instagram } from 'lucide-react';
+import { Phone, MapPin, RotateCcw, Instagram, MessageSquareHeart } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { setActiveTab, resetToDefaults, setIsApkModalOpen } = useApp();
+  const { setActiveTab, resetToDefaults } = useApp();
 
   return (
     <footer className="bg-stone-900 text-stone-300 pt-12 pb-8 border-t-4 border-orange-500">
@@ -70,11 +70,10 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <button
-                  onClick={() => setIsApkModalOpen(true)}
-                  className="text-amber-400 font-semibold hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
+                  onClick={() => { setActiveTab('posts'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="hover:text-amber-400 transition-colors cursor-pointer"
                 >
-                  <Smartphone className="w-3.5 h-3.5 text-orange-400" />
-                  <span>Install App / Download APK</span>
+                  सुविचार व प्रेरक संदेश
                 </button>
               </li>
             </ul>

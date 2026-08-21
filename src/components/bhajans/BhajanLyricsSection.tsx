@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Bhajan } from '../../types';
 import { DiyaIcon, OmSymbol } from '../common/DevotionalIcons';
+import { GeminiBhajanModal } from './GeminiBhajanModal';
 import {
   Music,
   Search,
@@ -19,7 +20,9 @@ import {
   Sparkles,
   ChevronRight,
   Flame,
-  ExternalLink
+  ExternalLink,
+  Mic,
+  ArrowRight
 } from 'lucide-react';
 
 interface BhajanLyricsSectionProps {
@@ -34,6 +37,9 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
   const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | null>(() => {
     return initialSelectedBhajan || bhajans[0] || null;
   });
+
+  // Gemini AI Bhajan Modal State
+  const [isGeminiModalOpen, setIsGeminiModalOpen] = useState(false);
 
   // Reading settings (font size scaler for comfortable recitation!)
   const [fontSizeLevel, setFontSizeLevel] = useState<number>(2); // 0: Small (15px), 1: Normal (17px), 2: Large (20px), 3: Extra Large (24px)
@@ -90,8 +96,8 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
       gujaratiTitle: '',
       hindiTitle: '',
       category: 'Hanumanji',
-      composer: 'Traditional Mandal',
-      ragaOrScale: 'Bilawal / C# Scale',
+      composer: '',
+      ragaOrScale: '',
       description: '',
       lyrics: '',
       youtubeUrl: ''
@@ -191,16 +197,52 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
           </p>
         </div>
 
-        {isAdmin && (
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
           <button
-            id="admin-add-bhajan-btn"
-            onClick={openAddModal}
-            className="self-start sm:self-auto px-4 py-2.5 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-md shadow-orange-600/20 flex items-center gap-2 cursor-pointer transition-all shrink-0"
+            onClick={() => setIsGeminiModalOpen(true)}
+            className="px-4 py-2.5 bg-linear-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-stone-950 text-xs sm:text-sm font-bold rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all border border-amber-300 shadow-amber-500/20"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add New Bhajan</span>
+            <Sparkles className="w-4 h-4 text-orange-800 animate-pulse" />
+            <Mic className="w-3.5 h-3.5 text-stone-900" />
+            <span>Gemini AI (भजन खोजें व जोड़ें)</span>
           </button>
-        )}
+
+          {isAdmin && (
+            <button
+              id="admin-add-bhajan-btn"
+              onClick={openAddModal}
+              className="px-4 py-2.5 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-md shadow-orange-600/20 flex items-center gap-2 cursor-pointer transition-all shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>मैन्युअल जोड़ें (Manual Add)</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Gemini AI Bhajan Search Banner Card */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-600 to-amber-600 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-amber-300">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-bold backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
+            <span>Gemini 3.7 Flash AI Bhajan Search</span>
+          </div>
+          <h2 className="font-serif-devotional text-base sm:text-lg font-bold text-white">
+            कोई भी भजन खोजें और 1-क्लिक में भजन लिरिक्स में जोड़ें
+          </h2>
+          <p className="text-xs text-amber-100 font-devanagari max-w-2xl">
+            माइक से बोलकर या लिखकर भजन का नाम बताएं — Gemini AI पूरी प्रामाणिक लिरिक्स (स्थायी, अंतरे, दोहा) खोजकर आपके इस भजन संग्रह में जोड़ देगा।
+          </p>
+        </div>
+
+        <button
+          onClick={() => setIsGeminiModalOpen(true)}
+          className="px-4 py-2.5 bg-white hover:bg-amber-50 text-orange-900 text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0 self-start sm:self-auto"
+        >
+          <Mic className="w-4 h-4 text-red-600 animate-pulse" />
+          <span>भजन खोजें व लिरिक्स जोड़ें</span>
+          <ArrowRight className="w-3.5 h-3.5 text-orange-600" />
+        </button>
       </div>
 
       {/* Category Pills & Search */}
@@ -224,23 +266,38 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
           </div>
 
           {/* Search input */}
-          <div className="relative w-full sm:w-72">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search title, words in lyrics..."
-              className="w-full pl-9 pr-4 py-2 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none"
-            />
-            <Search className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+          <div className="flex items-center gap-1.5 w-full sm:w-80">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && searchTerm.trim()) {
+                    setIsGeminiModalOpen(true);
+                  }
+                }}
+                placeholder="भजन, पंक्ति या शब्द खोजें..."
+                className="w-full pl-9 pr-8 py-2 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none"
+              />
+              <Search className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2.5 top-2.5 text-stone-400 hover:text-stone-600 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={() => setIsGeminiModalOpen(true)}
+              className="p-2 bg-amber-100 hover:bg-amber-200 text-orange-800 rounded-xl transition-colors cursor-pointer shrink-0 border border-amber-300"
+              title="Gemini AI से नया भजन खोजें व जोड़ें"
+            >
+              <Sparkles className="w-4 h-4 text-orange-600 animate-pulse" />
+            </button>
           </div>
         </div>
       </div>
@@ -308,9 +365,27 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
           })}
 
           {filteredBhajans.length === 0 && (
-            <div className="p-8 text-center bg-white rounded-2xl border border-stone-200 text-stone-500">
-              <Music className="w-8 h-8 mx-auto text-stone-400 mb-2" />
-              <p className="text-xs font-semibold">No bhajans found</p>
+            <div className="p-6 text-center bg-white rounded-3xl border border-amber-200 text-stone-600 space-y-3 shadow-xs">
+              <div className="w-12 h-12 mx-auto rounded-full bg-amber-100 flex items-center justify-center text-orange-600">
+                <Music className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-stone-800">
+                  {searchTerm ? `"${searchTerm}" नहीं मिला` : 'कोई भजन नहीं मिला'}
+                </p>
+                <p className="text-xs text-stone-500 font-devanagari">
+                  Gemini AI से यह भजन तुरंत खोजकर अपनी लाइब्रेरी में जोड़ सकते हैं।
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsGeminiModalOpen(true)}
+                className="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-xl text-xs font-bold shadow-md hover:from-orange-700 hover:to-amber-700 transition-all flex items-center justify-center gap-1.5 mx-auto cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
+                <span>Gemini AI से खोजें व जोड़ें</span>
+              </button>
             </div>
           )}
         </div>
@@ -648,6 +723,12 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
           </div>
         </div>
       )}
+      {/* Gemini AI Bhajan Creator Modal */}
+      <GeminiBhajanModal
+        isOpen={isGeminiModalOpen}
+        onClose={() => setIsGeminiModalOpen(false)}
+        onBhajanAdded={(newBhajan) => setSelectedBhajan(newBhajan)}
+      />
     </div>
   );
 };

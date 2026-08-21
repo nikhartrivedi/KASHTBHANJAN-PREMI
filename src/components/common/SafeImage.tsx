@@ -52,7 +52,6 @@ export const SafeImage: React.FC<SafeImageProps> = ({
         src={currentSrc}
         alt={alt}
         referrerPolicy="no-referrer"
-        crossOrigin="anonymous"
         onError={handleError}
         onLoad={handleLoad}
         className={`w-full h-full object-cover transition-opacity duration-300 ${

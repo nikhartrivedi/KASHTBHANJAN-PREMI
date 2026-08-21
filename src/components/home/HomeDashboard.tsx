@@ -30,6 +30,8 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({ onSelectCeremony }
 
   const [copiedLink, setCopiedLink] = useState(false);
 
+  const [activeDarshanIndex, setActiveDarshanIndex] = useState(0);
+
   // Formatting date nicely
   const formatDate = (dateStr: string) => {
     try {
@@ -61,17 +63,13 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({ onSelectCeremony }
     }
   };
 
-  // Dedicated Divine Image of Shree Kashtabhanjan Dev, Sarangpur
-  const sarangpurHanumanjiImage =
-    'https://images.unsplash.com/photo-1583089892943-e02e5b017b6a?auto=format&fit=crop&w=1200&q=80';
-
   return (
     <div className="space-y-8 sm:space-y-10 pb-12 max-w-5xl mx-auto">
       {/* 1. Divine Sarangpur Kashtabhanjan Hanumanji Sacred Darshan Hero */}
-      <section className="relative overflow-hidden rounded-3xl bg-linear-to-b from-orange-700 via-amber-700 to-stone-900 text-white shadow-2xl border-2 border-amber-400/60">
-        <div className="grid grid-cols-1 md:grid-cols-12 items-center">
+      <section className="relative overflow-hidden rounded-3xl bg-linear-to-b from-orange-700 via-amber-700 to-stone-900 text-white shadow-2xl border-2 border-amber-400/60 p-6 sm:p-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 items-center gap-6">
           {/* Left Title & Salutation */}
-          <div className="md:col-span-6 p-6 sm:p-10 space-y-4 z-10">
+          <div className="md:col-span-7 space-y-4 z-10">
             <div className="inline-flex items-center space-x-2 bg-amber-400/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold text-amber-200 border border-amber-300/40">
               <DiyaIcon className="w-4 h-4 text-amber-300 animate-pulse" />
               <span>॥ શ્રી સાળંગપુર કષ્ટભંજન દેવ ॥</span>
@@ -85,7 +83,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({ onSelectCeremony }
               सारंगपुर धाम वाले कष्टभंजन हनुमान जी
             </p>
 
-            <p className="text-xs sm:text-sm text-amber-100/90 leading-relaxed">
+            <p className="text-xs sm:text-sm text-amber-100/90 leading-relaxed font-devanagari">
               सकल सुमंगल दायक, रघुनायक पद कंज।<br />
               कष्ट निवारक देव तुम, नमो नमो हनुमंत बलवीर॥
             </p>
@@ -100,22 +98,51 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({ onSelectCeremony }
             </div>
           </div>
 
-          {/* Right Sacred Photo Card */}
-          <div className="md:col-span-6 relative p-4 sm:p-6 flex justify-center">
-            <div className="relative w-full aspect-4/3 sm:aspect-square max-w-md rounded-2xl overflow-hidden shadow-2xl border-4 border-amber-300/80 bg-stone-900 group">
-              <SafeImage
-                src={sarangpurHanumanjiImage}
-                alt="श्री कष्टभंजन देव सारंगपुर हनुमान जी"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
-                <div className="text-center w-full">
-                  <span className="text-xs font-bold text-amber-300 uppercase tracking-widest font-devanagari">
-                    ॥ બોલો શ્રી કષ્ટભંજન દેવ ની જય ॥
-                  </span>
-                  <p className="text-[11px] text-stone-200">
-                    श्री सारंगपुर हनुमान जी महाराज दिव्य स्वरूप
+          {/* Right Sacred Devotional Photo Card */}
+          <div className="md:col-span-5 flex justify-center">
+            <div className="w-full max-w-sm rounded-3xl overflow-hidden bg-gradient-to-br from-amber-950 via-stone-900 to-black border-2 border-amber-400 shadow-2xl space-y-0 group">
+              <div className="relative h-64 sm:h-72 w-full overflow-hidden">
+                <SafeImage
+                  src={SARANGPUR_DARSHAN_PHOTOS[activeDarshanIndex].url}
+                  alt={SARANGPUR_DARSHAN_PHOTOS[activeDarshanIndex].title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/40 to-transparent" />
+                
+                {/* Top Badge */}
+                <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-amber-300 border border-amber-400/40 flex items-center gap-1.5 shadow-md">
+                  <DiyaIcon className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                  <span>सारंगपुर धाम दर्शन</span>
+                </div>
+
+                {/* Bottom Overlay Label */}
+                <div className="absolute bottom-3 inset-x-3 text-center space-y-1">
+                  <p className="text-sm font-bold text-amber-300 font-devanagari tracking-wide drop-shadow-md">
+                    ॥ {SARANGPUR_DARSHAN_PHOTOS[activeDarshanIndex].title} ॥
                   </p>
+                  <p className="text-[11px] text-stone-300 font-serif-devotional">
+                    {SARANGPUR_DARSHAN_PHOTOS[activeDarshanIndex].subtitle}
+                  </p>
+                </div>
+              </div>
+
+              {/* Photo Selector Dots & Shloka Bar */}
+              <div className="p-3 bg-amber-950/90 border-t border-amber-400/30 flex items-center justify-between">
+                <div className="flex items-center space-x-1.5">
+                  {SARANGPUR_DARSHAN_PHOTOS.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveDarshanIndex(idx)}
+                      className={`h-2 rounded-full transition-all cursor-pointer ${
+                        activeDarshanIndex === idx ? 'w-6 bg-amber-400' : 'w-2 bg-stone-600 hover:bg-stone-400'
+                      }`}
+                      title={`दर्शन ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <div className="text-[11px] text-amber-200/90 font-devanagari">
+                  संकट कटे मिटे सब पीरा।
                 </div>
               </div>
             </div>
@@ -257,25 +284,39 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({ onSelectCeremony }
                 </div>
               </div>
 
-              {/* Right Ceremony Photo */}
+              {/* Right Ceremony Photo or Sacred Emblem */}
               <div className="lg:col-span-5">
-                <div className="aspect-4/3 rounded-2xl overflow-hidden shadow-lg border-2 border-amber-300 relative group">
-                  <SafeImage
-                    src={nextSunderkand.photos[0]}
-                    alt={nextSunderkand.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
-                    <div className="text-white">
-                      <div className="text-xs font-bold text-amber-300 font-devanagari">
-                        ॥ श्री कष्टभंजन प्रेमी मंडल नौगामा ॥
-                      </div>
-                      <div className="text-xs text-stone-200">
-                        {nextSunderkand.venue}
+                {nextSunderkand.photos && nextSunderkand.photos.length > 0 ? (
+                  <div className="aspect-4/3 rounded-2xl overflow-hidden shadow-lg border-2 border-amber-300 relative group">
+                    <SafeImage
+                      src={nextSunderkand.photos[0]}
+                      alt={nextSunderkand.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
+                      <div className="text-white">
+                        <div className="text-xs font-bold text-amber-300 font-devanagari">
+                          ॥ श्री कष्टभंजन प्रेमी मंडल नौगामा ॥
+                        </div>
+                        <div className="text-xs text-stone-200">
+                          {nextSunderkand.venue}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="aspect-4/3 rounded-2xl bg-gradient-to-br from-amber-800 to-orange-950 flex flex-col items-center justify-center p-6 text-white text-center border-2 border-amber-400 shadow-md">
+                    <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-3xl font-black mb-3 border border-amber-300/40">
+                      ॐ
+                    </div>
+                    <p className="font-serif-devotional text-base font-bold text-amber-200">
+                      ॥ श्री सुंदरकांड पाठ ॥
+                    </p>
+                    <p className="text-xs text-amber-100/80 mt-1">
+                      {nextSunderkand.venue}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

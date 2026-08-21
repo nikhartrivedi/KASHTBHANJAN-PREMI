@@ -101,13 +101,13 @@ export const SunderkandSection: React.FC<SunderkandSectionProps> = ({ selectedCe
       venue: '',
       address: '',
       googleMapsUrl: '',
-      description: 'Devotional Sunderkand recitation with traditional instruments and 108 Deepotsav Aarti.',
+      description: '',
       hostName: '',
       hostContact: '',
-      notes: 'Mahaprasad will be served following the Maha Aarti.',
+      notes: '',
       status: 'upcoming',
       photoUrlInput: '',
-      photos: [PRESET_DARSHAN_PHOTOS[0].url, PRESET_DARSHAN_PHOTOS[1].url]
+      photos: []
     });
     setPhotoTab('upload');
     setIsAddEditModalOpen(true);
@@ -129,7 +129,7 @@ export const SunderkandSection: React.FC<SunderkandSectionProps> = ({ selectedCe
       notes: ceremony.notes || '',
       status: ceremony.status === 'upcoming' ? 'upcoming' : 'completed',
       photoUrlInput: '',
-      photos: ceremony.photos.length > 0 ? [...ceremony.photos] : [FALLBACK_DEVOTIONAL_IMAGES[0]]
+      photos: ceremony.photos ? [...ceremony.photos] : []
     });
     setPhotoTab('upload');
     setIsAddEditModalOpen(true);
@@ -138,13 +138,11 @@ export const SunderkandSection: React.FC<SunderkandSectionProps> = ({ selectedCe
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.date || !formData.venue || !formData.address) {
-      showToast('Please fill required fields: Title, Date, Venue & Address');
+      showToast('कृपया आवश्यक फ़ील्ड भरें: शीर्षक, दिनांक, स्थान व पता');
       return;
     }
 
-    const finalPhotos = formData.photos.length > 0
-      ? formData.photos
-      : [FALLBACK_DEVOTIONAL_IMAGES[0]];
+    const finalPhotos = formData.photos || [];
 
     if (editingCeremony) {
       updateCeremony({

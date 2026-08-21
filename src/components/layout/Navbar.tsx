@@ -15,7 +15,6 @@ import {
   Search,
   Flame,
   Bell,
-  Smartphone,
   Download,
   MessageSquareHeart,
   Wallet
@@ -28,8 +27,6 @@ export const Navbar: React.FC = () => {
     isAdmin,
     user,
     setIsAuthModalOpen,
-    isApkModalOpen,
-    setIsApkModalOpen,
     logout,
     nextSunderkand,
     announcements
@@ -141,17 +138,6 @@ export const Navbar: React.FC = () => {
 
           {/* Right Actions (Auth & Search) */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <button
-              id="install-apk-btn"
-              onClick={() => setIsApkModalOpen(true)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs sm:text-sm font-semibold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300/80 rounded-lg shadow-xs transition-colors cursor-pointer"
-              title="Install App on Android / Generate APK"
-            >
-              <Smartphone className="w-3.5 h-3.5 text-orange-600 shrink-0" />
-              <span className="hidden sm:inline">Install App / APK</span>
-              <span className="sm:hidden">App</span>
-            </button>
-
             {isAdmin ? (
               <div className="flex items-center space-x-2">
                 <button
@@ -211,17 +197,6 @@ export const Navbar: React.FC = () => {
           })}
 
           <div className="pt-2 border-t border-amber-100 space-y-1.5">
-            <button
-              onClick={() => {
-                setIsApkModalOpen(true);
-                setMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-sm bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-xl font-bold shadow-xs cursor-pointer"
-            >
-              <Smartphone className="w-4 h-4" />
-              <span>Install App on Android / Download APK</span>
-            </button>
-
             {isAdmin ? (
               <button
                 onClick={() => {

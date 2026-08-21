@@ -1,18 +1,22 @@
 // Utility for normalizing and handling image URLs and uploads reliably
 
 export const FALLBACK_DEVOTIONAL_IMAGES = [
+  'https://old.salangpurhanumanji.org/uploads/MobileHanumanji497_20250915113717.jpg',
   'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80',
   'https://images.unsplash.com/photo-1609358905581-e5382c16a815?auto=format&fit=crop&w=1200&q=80',
   'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1200&q=80',
   'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1608889825103-eb5ed706fc64?auto=format&fit=crop&w=1200&q=80'
+  'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80'
 ];
 
 export const PRESET_DARSHAN_PHOTOS = [
   {
-    title: 'श्री कष्टभंजन देव सारंगपुर दर्शन',
-    url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80'
+    title: 'श्री कष्टभंजन देव सारंगपुर धाम दर्शन',
+    url: 'https://old.salangpurhanumanji.org/uploads/MobileHanumanji497_20250915113717.jpg'
+  },
+  {
+    title: 'श्री कष्टभंजन देव प्रातः शृंगार दर्शन',
+    url: 'https://old.salangpurhanumanji.org/uploads/MobileHanumanji497_20250915113717.jpg'
   },
   {
     title: 'महा सुंदरकांड 108 दीपक महाआरती',
@@ -25,10 +29,6 @@ export const PRESET_DARSHAN_PHOTOS = [
   {
     title: 'दिव्य भजन कीर्तन एवं भक्ति मंडल',
     url: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    title: 'पवित्र दीपोत्सव एवं ध्वजा पूजन',
-    url: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80'
   }
 ];
 

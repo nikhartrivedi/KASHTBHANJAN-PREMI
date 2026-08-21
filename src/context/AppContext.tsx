@@ -36,8 +36,6 @@ interface AppContextType {
   logout: () => void;
   isAuthModalOpen: boolean;
   setIsAuthModalOpen: (open: boolean) => void;
-  isApkModalOpen: boolean;
-  setIsApkModalOpen: (open: boolean) => void;
   
   // Sunderkand
   ceremonies: SunderkandCeremony[];
@@ -82,7 +80,7 @@ interface AppContextType {
   // Cloud status
   isCloudSynced: boolean;
 
-  // Reset to initial demo data
+  // Reset / Clear Data
   resetToDefaults: () => Promise<void>;
 
   // Permanent Backup and Restore
@@ -121,7 +119,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isApkModalOpen, setIsApkModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isCloudSynced, setIsCloudSynced] = useState<boolean>(false);
@@ -189,13 +186,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...docSnap.data()
           })) as SunderkandCeremony[];
           setCeremonies(list);
-          setIsCloudSynced(true);
         } else {
-          // Initialize cloud collection with seed data if empty
-          INITIAL_SUNDERKAND_CEREMONIES.forEach(async (c) => {
-            await setDoc(doc(db, 'ceremonies', c.id), c);
-          });
+          setCeremonies([]);
         }
+        setIsCloudSynced(true);
       },
       (error) => {
         console.warn('Firestore Ceremonies snapshot error:', error);
@@ -212,12 +206,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...docSnap.data()
           })) as Bhajan[];
           setBhajans(list);
-          setIsCloudSynced(true);
         } else {
-          INITIAL_BHAJANS.forEach(async (b) => {
-            await setDoc(doc(db, 'bhajans', b.id), b);
-          });
+          setBhajans([]);
         }
+        setIsCloudSynced(true);
       },
       (error) => {
         console.warn('Firestore Bhajans snapshot error:', error);
@@ -234,12 +226,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...docSnap.data()
           })) as Announcement[];
           setAnnouncements(list);
-          setIsCloudSynced(true);
         } else {
-          INITIAL_ANNOUNCEMENTS.forEach(async (a) => {
-            await setDoc(doc(db, 'announcements', a.id), a);
-          });
+          setAnnouncements([]);
         }
+        setIsCloudSynced(true);
       },
       (error) => {
         console.warn('Firestore Announcements snapshot error:', error);
@@ -256,12 +246,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...docSnap.data()
           })) as CommunityPost[];
           setPosts(list);
-          setIsCloudSynced(true);
         } else {
-          INITIAL_POSTS.forEach(async (p) => {
-            await setDoc(doc(db, 'posts', p.id), p);
-          });
+          setPosts([]);
         }
+        setIsCloudSynced(true);
       },
       (error) => {
         console.warn('Firestore Posts snapshot error:', error);
@@ -278,12 +266,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...docSnap.data()
           })) as AccountingTransaction[];
           setTransactions(list);
-          setIsCloudSynced(true);
         } else {
-          INITIAL_TRANSACTIONS.forEach(async (t) => {
-            await setDoc(doc(db, 'transactions', t.id), t);
-          });
+          setTransactions([]);
         }
+        setIsCloudSynced(true);
       },
       (error) => {
         console.warn('Firestore Transactions snapshot error:', error);
@@ -572,39 +558,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const resetToDefaults = async () => {
     if (typeof window !== 'undefined') {
       const confirmReset = window.confirm(
-        'चेतावनी (Warning): क्या आप वाकई सारा डेटा मूल डिफ़ॉल्ट पर रीसेट करना चाहते हैं? आपके द्वारा किए गए सभी कस्टम बदलाव मिट जाएंगे।'
+        'चेतावनी (Warning): क्या आप वाकई सारा डेटा खाली/रीसेट करना चाहते हैं?'
       );
       if (!confirmReset) return;
     }
-    setCeremonies(INITIAL_SUNDERKAND_CEREMONIES);
-    setBhajans(INITIAL_BHAJANS);
-    setAnnouncements(INITIAL_ANNOUNCEMENTS);
-    setPosts(INITIAL_POSTS);
-    setTransactions(INITIAL_TRANSACTIONS);
+    setCeremonies([]);
+    setBhajans([]);
+    setAnnouncements([]);
+    setPosts([]);
+    setTransactions([]);
+
+    localStorage.setItem(STORAGE_KEYS.CEREMONIES, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEYS.BHAJANS, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify([]));
 
     try {
-      // Sync defaults to Cloud Firestore
-      const batch = writeBatch(db);
-      INITIAL_SUNDERKAND_CEREMONIES.forEach((c) => {
-        batch.set(doc(db, 'ceremonies', c.id), c);
-      });
-      INITIAL_BHAJANS.forEach((b) => {
-        batch.set(doc(db, 'bhajans', b.id), b);
-      });
-      INITIAL_ANNOUNCEMENTS.forEach((a) => {
-        batch.set(doc(db, 'announcements', a.id), a);
-      });
-      INITIAL_POSTS.forEach((p) => {
-        batch.set(doc(db, 'posts', p.id), p);
-      });
-      INITIAL_TRANSACTIONS.forEach((t) => {
-        batch.set(doc(db, 'transactions', t.id), t);
-      });
-      await batch.commit();
-      showToast('Mandal data reset to authentic defaults in Cloud Firestore.');
+      // Clear Firestore collections
+      const collections = ['ceremonies', 'bhajans', 'announcements', 'posts', 'transactions'];
+      for (const colName of collections) {
+        const snap = await getDocs(collection(db, colName));
+        if (!snap.empty) {
+          const batch = writeBatch(db);
+          snap.docs.forEach((d) => batch.delete(d.ref));
+          await batch.commit();
+        }
+      }
+      showToast('सारा डेटा सफलतापूर्वक खाली/रीसेट कर दिया गया है।');
     } catch (err) {
       console.error('Reset batch commit error:', err);
-      showToast('Mandal data reset locally.');
+      showToast('डेटा लोकल स्तर पर रीसेट कर दिया गया है।');
     }
   };
 
@@ -707,8 +691,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         logout,
         isAuthModalOpen,
         setIsAuthModalOpen,
-        isApkModalOpen,
-        setIsApkModalOpen,
         ceremonies,
         nextSunderkand,
         addCeremony,
