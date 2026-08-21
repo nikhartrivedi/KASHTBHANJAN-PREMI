@@ -1,0 +1,228 @@
+{
+  "name": "Kashtabhanjan Premi — Sunderkand & Mandal",
+  "short_name": "Kashtabhanjan",
+  "description": "Devotional community portal for Sunderkand ceremonies, Bhajan lyrics, Mandal events, photos, and Mandal management.",
+  "id": "/?source=pwa",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "tabbed",
+    "standalone",
+    "window-controls-overlay",
+    "minimal-ui",
+    "browser"
+  ],
+  "tab_strip": {
+    "home_tab": {
+      "scope_patterns": [
+        {
+          "pathname": "/"
+        }
+      ]
+    },
+    "new_tab_button": {
+      "url": "/?tab=sunderkand"
+    }
+  },
+  "background_color": "#fffbeb",
+  "theme_color": "#ea580c",
+  "orientation": "portrait-primary",
+  "lang": "hi",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.kashtabhanjan.premi",
+      "id": "com.kashtabhanjan.premi"
+    },
+    {
+      "platform": "windows",
+      "url": "https://www.microsoft.com/store/apps/9NBLGGH4NNS1",
+      "id": "KashtabhanjanPremi.MandalApp"
+    },
+    {
+      "platform": "webapp",
+      "url": "/manifest.json",
+      "id": "/?source=pwa"
+    }
+  ],
+  "categories": [
+    "lifestyle",
+    "books",
+    "community",
+    "entertainment"
+  ],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "note_taking": {
+    "new_note_url": "/?tab=bhajans"
+  },
+  "share_target": {
+    "action": "/?tab=bhajans",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+sunderkand",
+      "url": "/?tab=sunderkand&action=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "text/plain": [
+          ".txt"
+        ]
+      }
+    }
+  ],
+  "scope_extensions": [
+    {
+      "origin": "https://ais-pre-6np3pz4r5xx7fcnxvu2f4x-873618302876.asia-southeast1.run.app"
+    },
+    {
+      "origin": "https://ais-dev-6np3pz4r5xx7fcnxvu2f4x-873618302876.asia-southeast1.run.app"
+    },
+    {
+      "origin": "https://fonts.googleapis.com"
+    },
+    {
+      "origin": "https://fonts.gstatic.com"
+    }
+  ],
+  "widgets": [
+    {
+      "name": "Daily Sunderkand & Darshan",
+      "description": "Daily Darshan and Sunderkand updates",
+      "tag": "sunderkand-widget",
+      "template": "widget",
+      "ms_ac_template": "widget.json",
+      "data": "/?tab=sunderkand",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/screenshot-mobile.png",
+          "sizes": "720x1280",
+          "label": "Daily Darshan widget"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Kashtabhanjan Premi Dashboard & Sunderkand Portal"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Kashtabhanjan Premi Android Mobile App"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Sunderkand Path",
+      "short_name": "Sunderkand",
+      "description": "Recite Sunderkand Path with audio and Hindi meaning",
+      "url": "/?tab=sunderkand",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Bhajan Sangrah",
+      "short_name": "Bhajans",
+      "description": "Devotional Hanuman & Ram Bhajans lyrics",
+      "url": "/?tab=bhajans",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mandal Events",
+      "short_name": "Events",
+      "description": "Upcoming Sunderkand events and booking",
+      "url": "/?tab=events",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

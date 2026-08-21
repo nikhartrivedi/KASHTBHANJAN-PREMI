@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+.font-serif-devotional {
+  font-family: 'Rozha One', 'Cinzel', 'Noto Sans Devanagari', serif;
+}
+
+.font-devanagari {
+  font-family: 'Noto Sans Devanagari', 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+/* Devotional golden/saffron glow */
+.saffron-glow {
+  box-shadow: 0 4px 20px -2px rgba(249, 115, 22, 0.25);
+}
+
+.gold-glow {
+  box-shadow: 0 4px 20px -2px rgba(234, 179, 8, 0.25);
+}
+
+/* Custom scrollbar for lyrics and lists */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fdf6ec;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #fbd38d;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f6ad55;
+}
+

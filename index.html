@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kashtabhanjan Premi — Sunderkand & Mandal Community</title>
+    <meta name="description" content="Devotional community portal for Sunderkand ceremonies, Bhajan lyrics, Mandal events, photos, and Mandal management." />
+    <meta name="theme-color" content="#ea580c" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Kashtabhanjan Premi" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon-192.svg" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    
+    <!-- Open Graph & PWA Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Kashtabhanjan Premi — Sunderkand & Mandal Community" />
+    <meta property="og:description" content="Devotional community portal for Sunderkand ceremonies, Bhajan lyrics, Mandal events, photos, and Mandal management." />
+    <meta property="og:image" content="/icon-512.png" />
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').then(function(reg) {
+            console.log('Kashtabhanjan PWA SW registered successfully:', reg.scope);
+          }).catch(function(err) {
+            console.log('SW registration note:', err);
+          });
+        });
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Rozha+One&family=Rozha+One&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-amber-50/40 text-slate-800 antialiased font-sans selection:bg-orange-500 selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

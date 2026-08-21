@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bgGrad192" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="50%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="goldGrad192" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="192" height="192" rx="42" fill="url(#bgGrad192)"/>
+  <rect x="6" y="6" width="180" height="180" rx="36" fill="none" stroke="#fde047" stroke-width="2" stroke-opacity="0.5"/>
+  <circle cx="96" cy="85" r="55" fill="#fef08a" fill-opacity="0.2"/>
+
+  <!-- Gada -->
+  <g transform="translate(96, 82) scale(0.42)">
+    <path d="M -42,-45 C -42,-75 42,-75 42,-45 C 50,-10 25,18 12,25 L 12,125 C 12,130 5,135 0,135 C -5,135 -12,130 -12,125 L -12,25 C -25,18 -50,-10 -42,-45 Z" fill="url(#goldGrad192)" stroke="#78350f" stroke-width="4"/>
+    <path d="M 0,-92 L 14,-68 L -14,-68 Z" fill="#fef08a" stroke="#78350f" stroke-width="3"/>
+    <circle cx="0" cy="-92" r="7" fill="#fef08a" stroke="#78350f" stroke-width="3"/>
+    <circle cx="0" cy="130" r="14" fill="url(#goldGrad192)" stroke="#78350f" stroke-width="3"/>
+    <path d="M -6,-60 L 6,-60 L 4,-35 L 0,-25 L -4,-35 Z" fill="#dc2626"/>
+  </g>
+
+  <text x="96" y="160" text-anchor="middle" fill="#ffffff" font-family="'Noto Sans Devanagari', system-ui, sans-serif" font-size="14" font-weight="800">
+    कष्टभंजन प्रेमी
+  </text>
+</svg>

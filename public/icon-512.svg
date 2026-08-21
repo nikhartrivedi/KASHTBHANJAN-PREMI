@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="50%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ea580c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#7c2d12" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle inner border -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#fde047" stroke-width="4" stroke-opacity="0.4"/>
+
+  <!-- Sun radiance -->
+  <circle cx="256" cy="230" r="180" fill="url(#sunGlow)"/>
+
+  <!-- Decorative Halo / Chakra Ring -->
+  <circle cx="256" cy="230" r="140" fill="none" stroke="#fef08a" stroke-width="3" stroke-dasharray="8,6" opacity="0.6"/>
+  <circle cx="256" cy="230" r="120" fill="none" stroke="#fef08a" stroke-width="2" opacity="0.4"/>
+
+  <!-- Central Emblem: Sacred Gada (Mace) of Lord Hanuman & Om / Trishul / Lotus motif -->
+  <g filter="url(#shadow)" transform="translate(256, 230)">
+    <!-- Gada head -->
+    <path d="M -42,-45 C -42,-75 42,-75 42,-45 C 50,-10 25,18 12,25 L 12,125 C 12,130 5,135 0,135 C -5,135 -12,130 -12,125 L -12,25 C -25,18 -50,-10 -42,-45 Z" fill="url(#goldGrad)" stroke="#78350f" stroke-width="3"/>
+    
+    <!-- Top finial of gada -->
+    <path d="M 0,-92 L 14,-68 L -14,-68 Z" fill="#fef08a" stroke="#78350f" stroke-width="2"/>
+    <circle cx="0" cy="-92" r="7" fill="#fef08a" stroke="#78350f" stroke-width="2"/>
+
+    <!-- Gada ridges -->
+    <ellipse cx="0" cy="-45" rx="38" ry="14" fill="none" stroke="#78350f" stroke-width="3" opacity="0.7"/>
+    <ellipse cx="0" cy="-25" rx="32" ry="10" fill="none" stroke="#78350f" stroke-width="2" opacity="0.7"/>
+    
+    <!-- Gada bottom knob -->
+    <circle cx="0" cy="130" r="14" fill="url(#goldGrad)" stroke="#78350f" stroke-width="2"/>
+
+    <!-- Tilak on Gada -->
+    <path d="M -6,-60 L 6,-60 L 4,-35 L 0,-25 L -4,-35 Z" fill="#dc2626"/>
+    <circle cx="0" cy="-30" r="3" fill="#fef08a"/>
+  </g>
+
+  <!-- Community Banner text / Subtitle -->
+  <text x="256" y="415" text-anchor="middle" fill="#ffffff" font-family="'Noto Sans Devanagari', 'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="1">
+    कष्टभंजन प्रेमी
+  </text>
+  <text x="256" y="450" text-anchor="middle" fill="#fef08a" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="700" letter-spacing="3">
+    SUNDERKAND MANDAL
+  </text>
+</svg>

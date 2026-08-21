@@ -1,0 +1,6 @@
+{
+  "name": "Kashtabhanjan Premi",
+  "description": "Devotional community app for managing Sunderkand ceremonies, Bhajan lyrics, Mandal events, photo galleries, announcements, and accounting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

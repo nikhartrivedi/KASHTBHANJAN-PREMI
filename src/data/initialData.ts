@@ -1,0 +1,593 @@
+import { SunderkandCeremony, Bhajan, MandalEvent, PhotoCollection, Announcement, AccountingTransaction } from '../types';
+
+export const INITIAL_SUNDERKAND_CEREMONIES: SunderkandCeremony[] = [
+  {
+    id: 'sund-1',
+    title: '52nd Maha Sunderkand Path & Deepotsav',
+    date: '2026-08-29', // Upcoming Saturday
+    startTime: '08:30 PM',
+    endTime: '11:30 PM',
+    venue: 'Shree Rameshwar Community Hall',
+    address: 'Nr. Kashtabhanjan Mandir, 100 Feet Anandnagar Road, Prahladnagar, Ahmedabad - 380015',
+    googleMapsUrl: 'https://maps.google.com/?q=Ahmedabad+Kashtabhanjan+Mandir',
+    description: 'Devotional collective Sunderkand path recital by Kashtabhanjan Premi Mandal with traditional dholak, harmonium, and majestic 108 Deepak Maha Aarti. All devotees and families are cordially invited.',
+    hostName: 'Shree Rajeshbhai & Gitaben Patel Parivar',
+    hostContact: '+91 98250 12345',
+    photos: [
+      'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1609358905581-e5382c16a815?auto=format&fit=crop&w=800&q=80'
+    ],
+    notes: 'Mahaprasad (Bhojan) will be served immediately after the Maha Aarti at 11:30 PM. Please arrive 15 minutes before commencement.',
+    status: 'upcoming',
+    createdAt: '2026-08-15'
+  },
+  {
+    id: 'sund-2',
+    title: 'Shravan Special Sunderkand & Hanumanji Shringar',
+    date: '2026-09-05',
+    startTime: '08:00 PM',
+    endTime: '11:00 PM',
+    venue: 'Shree Kashtabhanjan Dev Prarthana Bhavan',
+    address: 'Opp. BAPS Swaminarayan Mandir, Satellite Road, Ahmedabad - 380051',
+    googleMapsUrl: 'https://maps.google.com/?q=Satellite+Ahmedabad',
+    description: 'Special auspicious Shravan Maas Sunderkand path accompanied by melodious bhajans of Lord Ram & Hanumanji with grand flower shringar darshan.',
+    hostName: 'Mandal Sanyojak Samiti & Donors',
+    hostContact: '+91 98980 67890',
+    photos: [
+      'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=800&q=80'
+    ],
+    notes: 'Dry fruit prasad will be distributed to all attending bhaktas. Sunderkand books will be provided by the Mandal.',
+    status: 'upcoming',
+    createdAt: '2026-08-18'
+  },
+  {
+    id: 'sund-3',
+    title: '51st Akhand Sunderkand Samaroh (Shravan Pratipada)',
+    date: '2026-08-15',
+    startTime: '08:30 PM',
+    endTime: '11:45 PM',
+    venue: 'Shree Umiya Mataji Seva Trust Hall',
+    address: 'Bopal - Ambli Cross Roads, Ahmedabad - 380058',
+    googleMapsUrl: 'https://maps.google.com/?q=Bopal+Ahmedabad',
+    description: 'A divine evening attended by over 350 devotees with enthusiastic bhajan kirtan and devotional trance. 108 Diya Deepotsav was offered to Kashtabhanjan Dada.',
+    hostName: 'Shree Nileshbhai & Bhavnaben Shah',
+    hostContact: '+91 94260 45678',
+    photos: [
+      'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1609358905581-e5382c16a815?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80'
+    ],
+    notes: 'Ceremony successfully conducted with 350+ attendees. Annakshetra prasad distributed.',
+    status: 'completed',
+    createdAt: '2026-08-01'
+  },
+  {
+    id: 'sund-4',
+    title: '50th Golden Jubilee Sunderkand Utsav',
+    date: '2026-08-01',
+    startTime: '07:30 PM',
+    endTime: '11:30 PM',
+    venue: 'Sarangpur Dham Cultural Hall',
+    address: 'Vastrapur Lake Road, Nr. Gurudwara, Ahmedabad - 380052',
+    googleMapsUrl: 'https://maps.google.com/?q=Vastrapur+Ahmedabad',
+    description: 'Milestone 50th continuous Sunderkand celebration. Honoured founding members and long-term singers with memento and Sarangpur sacred Prasad.',
+    hostName: 'Kashtabhanjan Premi Mandal Core Committee',
+    hostContact: '+91 98250 11111',
+    photos: [
+      'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=800&q=80'
+    ],
+    notes: 'Record participation of 500+ devotees. Gold-embossed Sunderkand books distributed.',
+    status: 'completed',
+    createdAt: '2026-07-20'
+  }
+];
+
+export const INITIAL_BHAJANS: Bhajan[] = [
+  {
+    id: 'bhajan-1',
+    title: 'Kashtbhanjan Dev Mara Sankat Harjo',
+    gujaratiTitle: 'કષ્ટભંજન દેવ મારા સંકટ હરજો',
+    hindiTitle: 'कष्टभंजन देव मारा संकट हरजो',
+    category: 'Hanumanji',
+    composer: 'Traditional Gujarati Devotional',
+    ragaOrScale: 'Bilawal / D# Scale',
+    isPopular: true,
+    dateAdded: '2026-08-01',
+    description: 'Soulful invocation to Shree Kashtabhanjan Hanumanji Maharaj of Sarangpur to remove all obstacles and distress.',
+    lyrics: `(દોહા)
+સાલંગપુરના શણગાર છો, દીનદુખીના આધાર છો,
+કષ્ટભંજન હનુમાનજી, ભક્તોના તારણહાર છો.
+
+(સ્થાયી)
+કષ્ટભંજન દેવ મારા સંકટ હરજો,
+સાલંગપુરના દાદા મારી લાજ રાખજો... (૨)
+અમે આવ્યા તારે દ્વાર, દાદા કરો ઉદ્ધાર,
+કષ્ટભંજન દેવ મારા સંકટ હરજો...
+
+(અંતરો ૧)
+હાથમાં ગદા અને સીંદૂરી અંગ છે,
+રૂડાં સાલંગપુરમાં દાદા ભક્તિનો રંગ છે... (૨)
+તારી ધજા લહેરાય, જય જયકાર થાય,
+કષ્ટભંજન દેવ મારા સંકટ હરજો...
+
+(અંતરો ૨)
+શ્રી રામના તમે દૂત કહેવાયા,
+સંકટ સમયે ભક્તોની વહારે તમે આવ્યા... (૨)
+ચરણોમાં વંદન વારંવાર, દાદા આપો પ્યાર,
+કષ્ટભંજન દેવ મારા સંકટ હરજો...
+
+(અંતરો ૩)
+દાદા તારા આશીર્વાદ સદા મારે માથે,
+ચાલ્યા જઈએ અમે સદા સત્યની વાટે... (૨)
+મંડળ કરે પોકાર, સુણો અરજી અમારી,
+કષ્ટભંજન દેવ મારા સંકટ હરજો...`
+  },
+  {
+    id: 'bhajan-2',
+    title: 'Hanuman Chalisa (Complete 40 Chaupai)',
+    gujaratiTitle: 'શ્રી હનુમાન ચાલીસા',
+    hindiTitle: 'श्री हनुमान चालीसा',
+    category: 'Hanumanji',
+    composer: 'Goswami Tulsidasji',
+    ragaOrScale: 'Traditional / C Scale',
+    isPopular: true,
+    dateAdded: '2026-07-20',
+    description: 'The supreme 40-verse hymn in praise of Lord Hanuman, written by Goswami Tulsidasji.',
+    lyrics: `॥ દોહા ॥
+શ્રીગુરુ ચરન સરોજ રજ નિજ મનુ મુકુરુ સુધારી।
+બરનઉઁ રઘુબર બિમલ જસુ જો દાયકુ ફલ ચારિ॥
+બુદ્ધિહીન તનુ જાનિકે સુમિરૌં પવન-કુમાર।
+બલ બુદ્ધિ બિદ્યા દેહુ મોહિં હરહુ કલેસ બિકાર॥
+
+॥ ચોપાઈ ॥
+જય હનુમાન જ્ઞાન ગુન સાગર। જય કપીસ તિહુઁ લોક ઉજાગર॥
+રામદૂત અતુલિત બલ ધામા। અંજનિ-પુત્ર પવનસુત નામા॥
+મહાબીર બિક્રમ બજરંગી। કુમતિ નિવાર સુમતિ કે સંગી॥
+કંચન બરન બિરાજ સુબેસા। કાનન કુંડલ કુંચિત કેસા॥
+
+હાથ બજ્ર ઔ ધ્વજા બિરાજૈ। કાઁધે મૂઁજ જનેઊ સાજૈ॥
+સંકર સુવન કેસરીનંદન। તેજ પ્રતાપ મહા જગ બંદન॥
+બિદ્યાવાન ગુની અતિ ચાતુર। રામ કાજ કરિબે કો આતુર॥
+પ્રભુ ચરિત્ર સુનિબે કો રસિયા। રામ લખન સીતા મન બસિયા॥
+
+સૂક્ષ્મ રૂપ ધરિ સિયહિં દિખાવા। બિકટ રૂપ ધરિ લંક જરાવા॥
+ભીમ રૂપ ધરિ અસુર સંહારે। રામચંદ્ર કે કાજ સંવારે॥
+લાય સજીવન લખન જિયાયે। શ્રીરઘુબીર હરષિ ઉર લાયે॥
+રઘુપતિ કીન્હી બહુત બડ઼ાઈ। તુમ મમ પ્રિય ભરતહિ સમ ભાઈ॥
+
+સહસ બદન તુમ્હરો જસ ગાવૈં। અસ કહિ શ્રીપતિ કંઠ લગાવૈં॥
+સનકાદિક બ્રહ્માદિ મુનીસા। નારદ સારદ સહિત અહીસા॥
+જમ કુબેર દિગપાલ જહાઁ તે। કબી કોબિદ કહિ સકે કહાઁ તે॥
+તુમ ઉપકાર સુગ્રીવહિં કીન્હા। રામ મિલાય રાજ પદ દીન્હા॥
+
+તુમ્હરો મંત્ર બિભીષન માના। લંકેસ્વર ભયે સબ જગ જાના॥
+જુગ સહસ્ર જોજન પર ભાનૂ। લીલ્યો તાહિ મધુર ફલ જાનૂ॥
+પ્રભુ મુદ્રિકા મેલિ મુખ માહીં। જલધિ લાંઘિ ગયે અચરજ નાહીં॥
+દુર્ગમ કાજ જગત કે જેતે। સુગમ અનુગ્રહ તુમ્હરે તેતે॥
+
+રામ દુઆરે તુમ રખવારે। હોત ન આજ્ઞા બિનુ પૈસારે॥
+સબ સુખ લહૈ તુમ્હારી સરના। તુમ રક્ષક કાહૂ કો ડર ના॥
+આપન તેજ સમ્હારો આપૈ। તીનોં લોક હાઁક તેઁ કાઁપૈ॥
+ભૂત પિસાચ નિકટ નહિં આવૈ। મહાબીર જબ નામ સુનાવૈ॥
+
+નાસૈ રોગ હરૈ સબ પીરા। જપત નિરંતર હનુમત બીરા॥
+સંકટ તેં હનુમાન છુડ઼ાવૈ। મન ક્રમ બચન ધ્યાન જો લાવૈ॥
+સબ પર રામ તપસ્વી રાજા। તિન કે કાજ સકલ તુમ સાજા॥
+ઔર મનોરથ જો કોઈ લાવૈ। સોઈ અમિત જીવન ફલ પાવૈ॥
+
+ચારોં જુગ પરતાપ તુમ્હારા। હૈ પરસિદ્ધ જગત ઉજિયારા॥
+સાધુ-સંત કે તુમ રખવારે। અસુર નિકંદન રામ દુલારે॥
+અષ્ટ સિદ્ધિ નૌ નિધિ કે દાતા। અસ બર દીન જાનકી માતા॥
+રામ રસાયન તુમ્હરે પાસા। સદા રહો રઘુપતિ કે દાસા॥
+
+તુમ્હરે ભજન રામ કો ભાવૈ। જનમ-જનમ કે દુખ બિસરાવૈ॥
+અન્તકાલ રઘુબર પુર જાઈ। જહાઁ જન્મ હરિ-ભક્ત કહાઈ॥
+ઔર દેવતા ચિત્ત ન ધરઈ। હનુમત સેઈ સર્બ સુખ કરઈ॥
+સંકટ કટૈ મિટૈ સબ પીરા। જો સુમિરૈ હનુમત બલબીરા॥
+
+જય જય જય હનુમાન ગોસાઈં। કૃપા કરહુ ગુરુદેવ કી નાઈં॥
+જો સત બાર પાઠ કર કોઈ। છૂટહિ બંદિ મહા સુખ होई॥
+જો યહ પઢ઼ૈ હનુમાન ચાલીસા। હોય સિદ્ધિ સાખી ગૌરીસા॥
+તુલસીદાસ સદા હરિ ચેરા। કીજૈ નાથ હૃદય મહઁ ડેરા॥
+
+॥ દોહા ॥
+પવનતનય સંકટ હરન મંગલ મૂરતિ રૂપ।
+રામ લખન સીતા સહિત હૃદય બસહુ સુર ભૂપ॥`
+  },
+  {
+    id: 'bhajan-3',
+    title: 'Mangal Murti Maruti Nandan',
+    gujaratiTitle: 'મંગલ મૂર્તિ મારુતિ નંદન સકલ અમંગલ મૂલ નિકંદન',
+    hindiTitle: 'मंगल मूर्ति मारुति नंदन सकल अमंगल मूल निकंदन',
+    category: 'Hanumanji',
+    composer: 'Tulsidasji / Classical Bhajan',
+    ragaOrScale: 'Bhairavi / G Scale',
+    isPopular: true,
+    dateAdded: '2026-07-25',
+    description: 'Devotional song describing the divine strength, purity, and benevolence of Lord Maruti.',
+    lyrics: `મંગલ મૂર્તિ મારુતિ નંદન,
+સકલ અમંગલ મૂલ નિકંદન... (૨)
+પવન તનય સંતન હિતકારી,
+હૃદય બિરાજત અવધ બિહારી...
+
+અંજની પુત્ર પવન સુત નામા,
+જય જય જય સિયારામ કે ધામા...
+સુમિરન કરત કલેશ બિનાસે,
+સુખ સંપતિ ઘર આય પ્રકાશે...
+
+ચારુ શીલ ચંદન તન સોહૈ,
+સુર મુનિ જન મન સબકો મોહૈ...
+કષ્ટભંજન જય સાલંગપુર વાલા,
+ભક્ત જનો કે તારણહારા...
+
+મંગલ મૂર્તિ મારુતિ નંદન,
+સકલ અમંગલ મૂલ નિકંદન...`
+  },
+  {
+    id: 'bhajan-4',
+    title: 'Aarti Kije Hanuman Lala Ki',
+    gujaratiTitle: 'આરતી કીજે હનુમાન લલા કી',
+    hindiTitle: 'आरती कीजै हनुमान लला की',
+    category: 'Aarti',
+    composer: 'Sant Ramanandji',
+    ragaOrScale: 'Traditional Aarti',
+    isPopular: true,
+    dateAdded: '2026-07-15',
+    description: 'The supreme traditional Aarti recited at the conclusion of every Sunderkand Path.',
+    lyrics: `આરતી કીજૈ હનુમાન લલા કી।
+દુષ્ટ દલન રઘુનાથ કલા કી॥
+
+જાકે બલ સે ગિરિવર કાંપૈ।
+રોગ દોષ જાકે નિકટ ન ઝાંપૈ॥
+અંજની પુત્ર મહા બલદાયી।
+સંતન કે પ્રભુ સદા સહાઈ॥
+
+દે બીરા રઘુનાથ પઠાએ।
+લંકા જારી સિયા સુધિ લાએ॥
+લંકા સો કોટ સમુદ્ર સી ખાઈ।
+જાત પવનસુત બાર ન લાઈ॥
+
+લંકા જારી અસુર સંહારે।
+સિયા રામજી કે કાજ સંવારે॥
+લક્ષ્મણ મૂર્છિત પડે સકારે।
+આનિ સજીવન પ્રાન ઉબારે॥
+
+પૈઠિ પતાલ તોરિ જમકારે।
+અહિરાવન કી ભુજા ઉખારે॥
+બાએં ભુજા અસુર દલ મારે।
+દાહિને ભુજા સંત જન તારે॥
+
+સુર નર મુનિ આરતી ઉતારૈં।
+જય જય જય હનુમાન ઉચારૈં॥
+કંચન થાર કપૂર લૌ છાઈ।
+આરતી કરત અંજના માઈ॥
+
+જો હનુમાનજી કી આરતી ગાવૈ।
+બસિ બૈકુંઠ પરમ પદ પાવૈ॥
+આરતી કીજૈ હનુમાન લલા કી।
+દુષ્ટ દલન રઘુનાથ કલા કી॥`
+  },
+  {
+    id: 'bhajan-5',
+    title: 'Shree Ramchandra Kripalu Bhaju Man',
+    gujaratiTitle: 'શ્રી રામચંદ્ર કૃપાલુ ભજુ મન',
+    hindiTitle: 'श्री रामचंद्र कृपालु भजु मन हरण भवभय दारुणं',
+    category: 'Ramji',
+    composer: 'Goswami Tulsidasji',
+    ragaOrScale: 'Raga Yaman / C#',
+    isPopular: true,
+    dateAdded: '2026-08-05',
+    description: 'Divine Ram Stuti praising the lotus-eyed Lord Ramachandra, sung during Sunderkand samaroh.',
+    lyrics: `શ્રી રામચંદ્ર કૃપાલુ ભજુ મન હરણ ભવભય દારુણં।
+નવકંજ લોચન, કંજ મુખ, કર કંજ, પદ કંજારુણં॥
+
+કંદર્પ અગણિત અમિત છબિ, નવનીલ નીરદ સુંદરં।
+પટ પીત માનહુ તડિત રુચિ શુચિ નૌમિ જનક સુતાવરં॥
+
+ભજુ દીનબંધુ દિનેશ દાનવ દૈત્ય વંશ નિકંદનં।
+રઘુનંદ આનન્દકંદ કોશલ ચંદ દશરથ નંદનં॥
+
+સિર મુકુટ કુંડલ તિલક ચારુ ઉદારુ અંગ વિભૂષણં।
+આજાનુભુજ શર ચાપ ધર, સંગ્રામ-જિત-ખર દૂષણં॥
+
+ઇતિ વદતિ તુલસીદાસ શંકર શેષ મુનિ મન રંજં।
+મમ હૃદય કંજ નિવાસ કુરુ, કામાદિ ખલ દલ ગંજનં॥`
+  },
+  {
+    id: 'bhajan-6',
+    title: 'Dholak Dhoon & Mahamantra (Hare Ram Hare Krishna)',
+    gujaratiTitle: 'મંડળ સંકીર્તન ધૂન',
+    hindiTitle: 'मंडल संकीर्तन धून',
+    category: 'Dhoon',
+    composer: 'Mandal Samiti',
+    ragaOrScale: 'Fast Keharwa',
+    isPopular: false,
+    dateAdded: '2026-08-10',
+    description: 'Fast paced rhythmic dhoon recited between Sunderkand chapters with clapping.',
+    lyrics: `શ્રી રામ જય રામ જય જય રામ... (૪)
+જય જય હનુમાન, જય કષ્ટભંજન,
+જય સાલંગપુર વાલા હનુમાન...
+
+હરે રામ હરે રામ, રામ રામ હરે હરે,
+હરે કૃષ્ણ હરે કૃષ્ણ, કૃષ્ણ કૃષ્ણ હરે હરે...
+
+પવનતનય બલ ધામ, રામ દૂત ગુણવાન,
+કરો અમારો કલ્યાણ, ઓ સાલંગપુર ના હનુમાન...`
+  },
+  {
+    id: 'bhajan-7',
+    title: 'Thal: Jamo Thali Bharine Lai Re (Sarangpur Dada Thal)',
+    gujaratiTitle: 'થાળ: જમો થાળી ભરીને લાવી રે દાદા',
+    hindiTitle: 'थाल: जमो थाली भरीने लावी रे दादा',
+    category: 'Thal',
+    composer: 'Devotee Traditional',
+    ragaOrScale: 'Kafi / D Scale',
+    isPopular: true,
+    dateAdded: '2026-08-12',
+    description: 'Traditional Gujarati Mahaprasad offering Thal sung before Annakshetra and Aarti.',
+    lyrics: `જમો થાળી ભરીને લાવી રે દાદા મારા કષ્ટભંજના...
+ભાવે કરીને જમો રે દાદા, પ્રેમથી અર્પણ કરું...
+
+મોતીચૂર લાડુ ને ઘીના શીરા,
+કાજુ બદામ પિસ્તા મીઠા મેવા...
+કેસરિયું દૂધપાક ને પૂરી ગરમાગરમ,
+જમો મારા વાલા સાલંગપુરના નાથ...
+
+જળ જમુનાની ઝારી ભરી લાવ્યા,
+મુખવાસમાં એલચી લવિંગ લાવી...
+સંતો મહંતો ને ભક્તો મળીને,
+પ્રેમે કરે છે થાળ સમર્પણ...
+
+જમો થાળી ભરીને લાવી રે દાદા મારા કષ્ટભંજના...`
+  }
+];
+
+export const INITIAL_MANDAL_EVENTS: MandalEvent[] = [
+  {
+    id: 'event-1',
+    title: 'Grand Hanuman Jayanti Maha Mahotsav 2026',
+    date: '2026-09-12',
+    time: '06:00 AM - 10:00 PM',
+    venue: 'Kashtabhanjan Premi Mandal Complex & Grounds',
+    address: 'Plot 42, Devotional Circle, S.G. Highway, Ahmedabad',
+    description: 'Full-day divine celebration featuring early morning 108 Kilo Sindoor Maha Abhishekam, 11 Akhand Sunderkand paths in unison, Sangeet Sandhya with renowned bhajan artists, and continuous Annakshetra Bhandara (Mahaprasad) for 5000+ devotees.',
+    category: 'Festival',
+    bannerUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80',
+    status: 'upcoming',
+    attendeesCount: 4200
+  },
+  {
+    id: 'event-2',
+    title: '14th Annual Sarangpur Padyatra & Suvarna Chhatra Arpan',
+    date: '2026-09-25',
+    time: '05:00 AM Departure',
+    venue: 'Departure from Ahmedabad to Shree Kashtabhanjan Mandir, Sarangpur',
+    address: 'Gathering at Iscon Circle, S.G. Highway, Ahmedabad',
+    description: '3-day devotional walking pilgrimage (Padyatra) with Kashtabhanjan Premi Mandal flag, singing continuous bhajans, medical and food support vehicles accompanying, concluding with offering of a sacred Golden Chhatra at Sarangpur Dham.',
+    category: 'Padyatra',
+    bannerUrl: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1200&q=80',
+    status: 'upcoming',
+    attendeesCount: 350
+  },
+  {
+    id: 'event-3',
+    title: 'Akhand Kheer & Malpua Annakshetra Seva',
+    date: '2026-08-10',
+    time: '12:00 PM - 04:00 PM',
+    venue: 'Mandal Community Kitchen',
+    address: 'Near Civil Hospital Road, Asarwa, Ahmedabad',
+    description: 'Community seva serving hot Kheer, Malpua, and fresh nutritious meals to patient families and needy brethren with volunteer devotee participation.',
+    category: 'Seva & Bhandara',
+    bannerUrl: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80',
+    status: 'completed',
+    attendeesCount: 850
+  },
+  {
+    id: 'event-4',
+    title: 'Mandal Sthapna Divas & Sangeet Sandhya',
+    date: '2026-07-28',
+    time: '07:00 PM - 11:30 PM',
+    venue: 'Town Hall Auditorium',
+    address: 'Ellisbridge, Ahmedabad - 380006',
+    description: 'Celebrated 12th foundation anniversary of Kashtabhanjan Premi Mandal with classical devotional vocalists and honoring elder Mandal sewaks.',
+    category: 'Sangeet Samaroh',
+    bannerUrl: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=1200&q=80',
+    status: 'completed',
+    attendeesCount: 650
+  }
+];
+
+export const INITIAL_PHOTO_COLLECTIONS: PhotoCollection[] = [
+  {
+    id: 'album-1',
+    title: '51st Sunderkand Path at Umiya Hall',
+    date: '2026-08-15',
+    location: 'Bopal, Ahmedabad',
+    category: 'Sunderkand',
+    coverPhoto: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+    photos: [
+      { id: 'p1', url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80', caption: 'Devotees deeply immersed in Sunderkand recitation' },
+      { id: 'p2', url: 'https://images.unsplash.com/photo-1609358905581-e5382c16a815?auto=format&fit=crop&w=1200&q=80', caption: '108 Diya Deepotsav offered to Kashtabhanjan Dada' },
+      { id: 'p3', url: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80', caption: 'Mandal musicians with traditional dholak & harmonium' },
+      { id: 'p4', url: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=1200&q=80', caption: 'Mahaprasad distribution to devotees' }
+    ],
+    ceremonyId: 'sund-3'
+  },
+  {
+    id: 'album-2',
+    title: '50th Golden Jubilee Ceremony & Shringar',
+    date: '2026-08-01',
+    location: 'Vastrapur, Ahmedabad',
+    category: 'Shringar & Darshan',
+    coverPhoto: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=800&q=80',
+    photos: [
+      { id: 'p5', url: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=1200&q=80', caption: 'Grand floral backdrop and idol decoration' },
+      { id: 'p6', url: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1200&q=80', caption: 'Auditorium filled with hundreds of singing bhaktas' },
+      { id: 'p7', url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80', caption: 'Maha Aarti lighted by chief guests and trustees' }
+    ],
+    ceremonyId: 'sund-4'
+  },
+  {
+    id: 'album-3',
+    title: 'Annakshetra & Bhandara Seva',
+    date: '2026-08-10',
+    location: 'Civil Hospital Road, Ahmedabad',
+    category: 'Annakshetra',
+    coverPhoto: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80',
+    photos: [
+      { id: 'p8', url: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80', caption: 'Volunteers preparing pure prasad meals' },
+      { id: 'p9', url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80', caption: 'Warm food being served respectfully to elders and children' }
+    ],
+    eventId: 'event-3'
+  }
+];
+
+export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
+  {
+    id: 'ann-1',
+    title: 'Next 52nd Sunderkand Path this Saturday at Rameshwar Hall',
+    content: 'All Mandal members and devotees are requested to note the timing: 08:30 PM sharp. Mahaprasad will be served by Patel Parivar after Aarti. Kindly RSVP in the WhatsApp group for seating arrangements.',
+    date: '2026-08-19',
+    isUrgent: true,
+    isPinned: true,
+    category: 'Sunderkand',
+    author: 'President, Kashtabhanjan Premi Mandal'
+  },
+  {
+    id: 'ann-2',
+    title: 'Registration Open for 14th Sarangpur Padyatra',
+    content: 'Devotees wishing to join the 3-day walking pilgrimage from Ahmedabad to Sarangpur Dham can register their names with Sewa Pramukh Shree Nileshbhai by 10th September. Bus facilities for luggage and prasad provided.',
+    date: '2026-08-17',
+    isUrgent: false,
+    isPinned: true,
+    category: 'Important',
+    author: 'Padyatra Samiti'
+  },
+  {
+    id: 'ann-3',
+    title: 'New Gujarati & Hindi Bhajan Lyrics Added to Library',
+    content: 'We have updated the Bhajan section with complete lyrics of Sarangpur Dada Thal, Mangal Murti Maruti Nandan, and full Hanuman Chalisa with font size controls for easy recitation during path.',
+    date: '2026-08-14',
+    isUrgent: false,
+    isPinned: false,
+    category: 'Bhajan',
+    author: 'Sangeet Vibhag'
+  }
+];
+
+export const INITIAL_ACCOUNTING_TRANSACTIONS: AccountingTransaction[] = [
+  {
+    id: 'acc-1',
+    type: 'income',
+    date: '2026-08-15',
+    amount: 25000,
+    category: 'Ceremony Sponsorship',
+    sourceOrDonor: 'Shree Nileshbhai & Bhavnaben Shah',
+    description: '51st Sunderkand Path full ceremony and prasad sponsorship contribution',
+    paymentMethod: 'UPI',
+    receiptNo: 'REC-2026-0815',
+    verifiedBy: 'Treasurer - Pravinbhai Mehta',
+    createdAt: '2026-08-15'
+  },
+  {
+    id: 'acc-2',
+    type: 'income',
+    date: '2026-08-15',
+    amount: 18500,
+    category: 'Devotee Aarti Donations',
+    sourceOrDonor: 'General Devotees (Aarti Hundi)',
+    description: 'Aarti and Deepotsav hundi collection during 51st Sunderkand Path',
+    paymentMethod: 'Cash',
+    receiptNo: 'REC-2026-0816',
+    verifiedBy: 'Pravinbhai Mehta',
+    createdAt: '2026-08-15'
+  },
+  {
+    id: 'acc-3',
+    type: 'expense',
+    date: '2026-08-15',
+    amount: 12500,
+    category: 'Prasad & Bhojan',
+    description: 'Mahaprasad grocery, kheer ingredients, fruits and prasad boxes',
+    paymentMethod: 'UPI',
+    voucherRef: 'VOUCH-815-01',
+    verifiedBy: 'Pravinbhai Mehta',
+    createdAt: '2026-08-15'
+  },
+  {
+    id: 'acc-4',
+    type: 'expense',
+    date: '2026-08-15',
+    amount: 5500,
+    category: 'Sound System & Instruments',
+    description: 'Audio setup, microphone rentals, and harmonium tuning assistance',
+    paymentMethod: 'Cash',
+    voucherRef: 'VOUCH-815-02',
+    verifiedBy: 'Pravinbhai Mehta',
+    createdAt: '2026-08-15'
+  },
+  {
+    id: 'acc-5',
+    type: 'expense',
+    date: '2026-08-15',
+    amount: 4000,
+    category: 'Flowers & Shringar',
+    description: 'Fresh marigold garlands, roses, and stage flower decoration',
+    paymentMethod: 'Cash',
+    voucherRef: 'VOUCH-815-03',
+    verifiedBy: 'Pravinbhai Mehta',
+    createdAt: '2026-08-15'
+  },
+  {
+    id: 'acc-6',
+    type: 'income',
+    date: '2026-08-10',
+    amount: 51000,
+    category: 'Annakshetra Fund',
+    sourceOrDonor: 'Rameshwar Group of Industries',
+    description: 'Bhandara and monthly food seva sponsorship donation',
+    paymentMethod: 'Bank Transfer',
+    receiptNo: 'REC-2026-0810',
+    verifiedBy: 'Pravinbhai Mehta',
+    createdAt: '2026-08-10'
+  },
+  {
+    id: 'acc-7',
+    type: 'expense',
+    date: '2026-08-10',
+    amount: 22000,
+    category: 'Annakshetra & Bhandara',
+    description: 'Pure ghee, grains, milk and cooking utensils for hospital food seva',
+    paymentMethod: 'Cheque',
+    voucherRef: 'VOUCH-810-01',
+    verifiedBy: 'Pravinbhai Mehta',
+    createdAt: '2026-08-10'
+  },
+  {
+    id: 'acc-8',
+    type: 'income',
+    date: '2026-08-01',
+    amount: 35000,
+    category: 'Golden Jubilee Support',
+    sourceOrDonor: 'Mandal Trustee & Core Members',
+    description: '50th Sunderkand souvenir books & memento sponsorship',
+    paymentMethod: 'UPI',
+    receiptNo: 'REC-2026-0801',
+    verifiedBy: 'Pravinbhai Mehta',
+    createdAt: '2026-08-01'
+  },
+  {
+    id: 'acc-9',
+    type: 'expense',
+    date: '2026-08-01',
+    amount: 14500,
+    category: 'Printing & Books',
+    description: 'Printing of 500 gold-embossed Sunderkand Gutka and bhajan booklets',
+    paymentMethod: 'Bank Transfer',
+    voucherRef: 'VOUCH-801-01',
+    verifiedBy: 'Pravinbhai Mehta',
+    createdAt: '2026-08-01'
+  }
+];
