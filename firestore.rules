@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Sunderkand ceremonies collection
+    match /ceremonies/{ceremonyId} {
+      allow read, write: if true;
+    }
+
+    // Bhajans collection
+    match /bhajans/{bhajanId} {
+      allow read, write: if true;
+    }
+
+    // Announcements collection
+    match /announcements/{announcementId} {
+      allow read, write: if true;
+    }
+
+    // Community Posts collection (सुविचार व फोटो)
+    match /posts/{postId} {
+      allow read, write: if true;
+    }
+
+    // Accounting Transactions collection (लेखा-जोखा / खाता)
+    match /transactions/{transactionId} {
+      allow read, write: if true;
+    }
+  }
+}
+

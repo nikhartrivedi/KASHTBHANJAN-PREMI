@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ShieldCheck, User, X, Lock, KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
-import { DiyaIcon, OmSymbol } from '../common/DevotionalIcons';
+import { ShieldCheck, User, X, Lock, KeyRound, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export const AuthModal: React.FC = () => {
-  const { isAuthModalOpen, setIsAuthModalOpen, loginAsAdmin, loginAsGuest, user, isAdmin, logout } = useApp();
+  const { isAuthModalOpen, setIsAuthModalOpen, loginAsAdmin, loginAsGuest, isAdmin } = useApp();
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!isAuthModalOpen) return null;
@@ -13,14 +13,17 @@ export const AuthModal: React.FC = () => {
   const handleAdminSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!password.trim()) {
+      setError('कृपया एडमिन पासवर्ड दर्ज करें (Please enter admin password).');
+      return;
+    }
     const success = loginAsAdmin(password);
     if (!success) {
-      setError('Invalid admin credentials. Use "admin" or "kashta123" for Mandal administration access.');
+      setError('गलत पासवर्ड! कृपया सही एडमिन पासवर्ड दर्ज करें।');
+    } else {
+      setPassword('');
+      setError(null);
     }
-  };
-
-  const handleQuickAdminLogin = () => {
-    loginAsAdmin('admin');
   };
 
   return (
@@ -32,8 +35,12 @@ export const AuthModal: React.FC = () => {
         {/* Modal Header */}
         <div className="bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 p-6 text-white text-center relative">
           <button
-            onClick={() => setIsAuthModalOpen(false)}
-            className="absolute top-4 right-4 p-1.5 text-white/80 hover:text-white hover:bg-black/10 rounded-full transition-colors"
+            onClick={() => {
+              setIsAuthModalOpen(false);
+              setError(null);
+              setPassword('');
+            }}
+            className="absolute top-4 right-4 p-1.5 text-white/80 hover:text-white hover:bg-black/10 rounded-full transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -43,10 +50,10 @@ export const AuthModal: React.FC = () => {
           </div>
 
           <h3 className="font-serif-devotional text-xl font-bold tracking-tight">
-            Kashtabhanjan Premi Login
+            Kashtabhanjan Premi Admin Login
           </h3>
           <p className="text-xs text-amber-100 mt-1">
-            Access Sunderkand Portal & Mandal Management
+            Access Sunderkand Portal & Mandal Administration
           </p>
         </div>
 
@@ -63,52 +70,51 @@ export const AuthModal: React.FC = () => {
           {/* Admin Login Form */}
           <form onSubmit={handleAdminSubmit} className="space-y-4">
             <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-orange-600" />
-                  Mandal Admin Access
-                </label>
-                <span className="text-[11px] text-stone-600">Key: <code className="bg-stone-100 px-1 py-0.5 rounded text-orange-700 font-mono">admin</code></span>
-              </div>
+              <label className="text-xs font-semibold text-stone-700 flex items-center gap-1.5 mb-1.5">
+                <ShieldCheck className="w-4 h-4 text-orange-600" />
+                <span>एडमिन पासवर्ड (Admin Password)</span>
+              </label>
+              
               <div className="relative">
                 <input
                   id="admin-password-input"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter admin password or passcode"
-                  className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 rounded-xl text-sm outline-none transition-all"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (error) setError(null);
+                  }}
+                  placeholder="पासवर्ड दर्ज करें..."
+                  autoFocus
+                  className="w-full pl-9 pr-10 py-2.5 bg-stone-50 border border-stone-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 rounded-xl text-sm outline-none transition-all"
                 />
                 <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-700 cursor-pointer"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
+
               {error && (
-                <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                  {error}
+                <p className="text-xs text-red-600 mt-2 flex items-center gap-1.5 font-medium bg-red-50 p-2 rounded-lg border border-red-100">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-500" />
+                  <span>{error}</span>
                 </p>
               )}
             </div>
 
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                id="submit-admin-login"
-                className="flex-1 py-2.5 px-4 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-sm font-semibold rounded-xl shadow-md shadow-orange-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <KeyRound className="w-4 h-4" />
-                <span>Login as Admin</span>
-              </button>
-
-              <button
-                type="button"
-                id="quick-demo-admin-btn"
-                onClick={handleQuickAdminLogin}
-                className="py-2.5 px-3 bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
-                title="1-Click Admin Access for testing"
-              >
-                1-Click Admin
-              </button>
-            </div>
+            <button
+              type="submit"
+              id="submit-admin-login"
+              className="w-full py-2.5 px-4 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-sm font-semibold rounded-xl shadow-md shadow-orange-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <KeyRound className="w-4 h-4" />
+              <span>Login as Administrator</span>
+            </button>
           </form>
 
           {/* Divider */}
@@ -126,7 +132,7 @@ export const AuthModal: React.FC = () => {
               <div>
                 <h4 className="text-sm font-bold text-stone-800">Devotee Guest Access</h4>
                 <p className="text-xs text-stone-500 mt-0.5">
-                  Browse Sunderkand dates, venue directions, read Bhajan lyrics, and view photos.
+                  Browse Sunderkand dates, venue details, read Bhajan lyrics, and view Mandal notices.
                 </p>
               </div>
             </div>
@@ -143,12 +149,12 @@ export const AuthModal: React.FC = () => {
           {/* Role Permissions Legend */}
           <div className="text-[11px] text-stone-500 space-y-1.5 pt-2 border-t border-stone-100">
             <div className="flex items-center gap-1.5 text-stone-700 font-medium">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Admin: Create ceremonies, manage accounting, add bhajans, upload photos</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Admin: Create & edit Sunderkand paths, add bhajans, post notices, data backup</span>
             </div>
             <div className="flex items-center gap-1.5 text-stone-700 font-medium">
-              <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" />
-              <span>Guest: View Sunderkand schedules, read lyrics with font scaler, photo darshan</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span>Guest: View Sunderkand schedules, read lyrics with font scaler, notifications</span>
             </div>
           </div>
         </div>

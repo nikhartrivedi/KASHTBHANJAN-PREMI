@@ -85,19 +85,32 @@ export interface Announcement {
   author: string;
 }
 
-export interface AccountingTransaction {
+export interface CommunityPost {
   id: string;
-  type: 'income' | 'expense';
+  title?: string;
+  thought: string; // Acche vichar / Motivational & devotional thoughts
+  imageUrl?: string;
+  authorName: string;
+  authorRole?: string;
   date: string;
-  amount: number;
-  category: string;
-  sourceOrDonor?: string;
-  description: string;
-  paymentMethod: 'Cash' | 'UPI' | 'Bank Transfer' | 'Cheque';
-  receiptNo?: string;
-  voucherRef?: string;
-  verifiedBy?: string;
+  likesCount?: number;
+  tags?: string[];
   createdAt: string;
 }
 
-export type ActiveTab = 'home' | 'sunderkand' | 'bhajans' | 'events' | 'gallery' | 'accounting' | 'admin-hub';
+export interface AccountingTransaction {
+  id: string;
+  type: 'income' | 'expense'; // Aavak (Income/Donation) or Jaavak (Expense)
+  title: string;
+  amount: number;
+  category: 'Donation (Bhet/Daan)' | 'Sunderkand Seva' | 'Prasad & Bhandara' | 'Sound & Dholak' | 'Mandap & Lights' | 'Padyatra' | 'Miscellaneous';
+  date: string;
+  donorOrReceiverName?: string;
+  paymentMode: 'Cash' | 'UPI/Online' | 'Bank Transfer' | 'Cheque';
+  receiptNo?: string;
+  notes?: string;
+  recordedBy: string;
+  createdAt: string;
+}
+
+export type ActiveTab = 'home' | 'sunderkand' | 'bhajans' | 'posts' | 'accounting' | 'admin-hub';

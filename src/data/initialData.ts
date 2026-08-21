@@ -1,4 +1,4 @@
-import { SunderkandCeremony, Bhajan, MandalEvent, PhotoCollection, Announcement, AccountingTransaction } from '../types';
+import { SunderkandCeremony, Bhajan, Announcement, CommunityPost, AccountingTransaction } from '../types';
 
 export const INITIAL_SUNDERKAND_CEREMONIES: SunderkandCeremony[] = [
   {
@@ -344,250 +344,138 @@ export const INITIAL_BHAJANS: Bhajan[] = [
   }
 ];
 
-export const INITIAL_MANDAL_EVENTS: MandalEvent[] = [
-  {
-    id: 'event-1',
-    title: 'Grand Hanuman Jayanti Maha Mahotsav 2026',
-    date: '2026-09-12',
-    time: '06:00 AM - 10:00 PM',
-    venue: 'SHREE KASHTBHANJAN PREMI Mandal Grounds',
-    address: 'Riwa Kirana Store, Nougama, Banswara, Rajasthan - 327603',
-    description: 'Full-day divine celebration featuring early morning 108 Kilo Sindoor Maha Abhishekam, 11 Akhand Sunderkand paths in unison, Sangeet Sandhya with renowned bhajan artists, and continuous Annakshetra Bhandara (Mahaprasad) for 5000+ devotees.',
-    category: 'Festival',
-    bannerUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80',
-    status: 'upcoming',
-    attendeesCount: 4200
-  },
-  {
-    id: 'event-2',
-    title: '14th Annual Sarangpur Padyatra & Suvarna Chhatra Arpan',
-    date: '2026-09-25',
-    time: '05:00 AM Departure',
-    venue: 'Departure from Nougama, Banswara to Shree Kashtabhanjan Mandir, Sarangpur',
-    address: 'Gathering at Riwa Kirana Store / Main Chowk, Nougama, Banswara',
-    description: 'Devotional walking pilgrimage (Padyatra) with SHREE KASHTBHANJAN PREMI flag, singing continuous bhajans, medical and food support vehicles accompanying, concluding with offering of a sacred Chhatra at Sarangpur Dham.',
-    category: 'Padyatra',
-    bannerUrl: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1200&q=80',
-    status: 'upcoming',
-    attendeesCount: 350
-  },
-  {
-    id: 'event-3',
-    title: 'Akhand Kheer & Malpua Annakshetra Seva',
-    date: '2026-08-10',
-    time: '12:00 PM - 04:00 PM',
-    venue: 'Mandal Annakshetra Bhavan',
-    address: 'Nougama, Banswara, Rajasthan - 327603',
-    description: 'Community seva serving hot Kheer, Malpua, and fresh nutritious meals to patient families and needy brethren with volunteer devotee participation.',
-    category: 'Seva & Bhandara',
-    bannerUrl: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80',
-    status: 'completed',
-    attendeesCount: 850
-  },
-  {
-    id: 'event-4',
-    title: 'Mandal Sthapna Divas & Sangeet Sandhya',
-    date: '2026-07-28',
-    time: '07:00 PM - 11:30 PM',
-    venue: 'Nougama Community Auditorium',
-    address: 'Nougama, Banswara - 327603',
-    description: 'Celebrated foundation anniversary of SHREE KASHTBHANJAN PREMI Mandal with devotional vocalists and honoring elder Mandal sewaks.',
-    category: 'Sangeet Samaroh',
-    bannerUrl: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=1200&q=80',
-    status: 'completed',
-    attendeesCount: 650
-  }
-];
-
-export const INITIAL_PHOTO_COLLECTIONS: PhotoCollection[] = [
-  {
-    id: 'album-1',
-    title: '51st Sunderkand Path at Nougama Prangan',
-    date: '2026-08-15',
-    location: 'Nougama, Banswara',
-    category: 'Sunderkand',
-    coverPhoto: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-    photos: [
-      { id: 'p1', url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80', caption: 'Devotees deeply immersed in Sunderkand recitation' },
-      { id: 'p2', url: 'https://images.unsplash.com/photo-1609358905581-e5382c16a815?auto=format&fit=crop&w=1200&q=80', caption: '108 Diya Deepotsav offered to Kashtabhanjan Dada' },
-      { id: 'p3', url: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80', caption: 'Mandal musicians with traditional dholak & harmonium' },
-      { id: 'p4', url: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=1200&q=80', caption: 'Mahaprasad distribution to devotees' }
-    ],
-    ceremonyId: 'sund-3'
-  },
-  {
-    id: 'album-2',
-    title: '50th Golden Jubilee Ceremony & Shringar',
-    date: '2026-08-01',
-    location: 'Nougama, Banswara',
-    category: 'Shringar & Darshan',
-    coverPhoto: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=800&q=80',
-    photos: [
-      { id: 'p5', url: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=1200&q=80', caption: 'Grand floral backdrop and idol decoration' },
-      { id: 'p6', url: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1200&q=80', caption: 'Auditorium filled with hundreds of singing bhaktas' },
-      { id: 'p7', url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80', caption: 'Maha Aarti lighted by chief guests and trustees' }
-    ],
-    ceremonyId: 'sund-4'
-  },
-  {
-    id: 'album-3',
-    title: 'Annakshetra & Bhandara Seva',
-    date: '2026-08-10',
-    location: 'Nougama Seva Kendra',
-    category: 'Annakshetra',
-    coverPhoto: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80',
-    photos: [
-      { id: 'p8', url: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80', caption: 'Volunteers preparing pure prasad meals' },
-      { id: 'p9', url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80', caption: 'Warm food being served respectfully to elders and children' }
-    ],
-    eventId: 'event-3'
-  }
-];
-
 export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
   {
     id: 'ann-1',
-    title: 'Next 52nd Sunderkand Path this Saturday at Nougama Prangan',
-    content: 'All Mandal members and devotees are requested to note the timing: 08:30 PM sharp. Mahaprasad will be served after Aarti. संपर्क सूत्र: 7732943851, 97721 14039, 9636223591.',
-    date: '2026-08-19',
-    isUrgent: true,
+    title: 'आगामी 52वां महा सुंदरकांड पाठ एवं 108 दीपक महाआरती',
+    content: 'समस्त भक्तजनों को सूचित किया जाता है कि शनिवार को सायं 8:30 बजे से रीवा किराना स्टोर प्रांगण, नौगामा में 52वां सुंदरकांड पाठ व महाआरती आयोजित होगी। आप सभी सपरिवार सादर आमंत्रित हैं।',
+    date: '2026-08-20',
     isPinned: true,
+    isUrgent: false,
     category: 'Sunderkand',
-    author: 'SHREE KASHTBHANJAN PREMI'
+    author: 'श्री कष्टभंजन प्रेमी मंडल समिति'
   },
   {
     id: 'ann-2',
-    title: 'Registration Open for Sarangpur Padyatra',
-    content: 'Devotees wishing to join the walking pilgrimage from Nougama, Banswara to Sarangpur Dham can register their names at Mandal Office (Riwa Kirana Store) or call 7732943851 / 97721 14039.',
-    date: '2026-08-17',
-    isUrgent: false,
-    isPinned: true,
-    category: 'Important',
-    author: 'Padyatra Samiti'
-  },
-  {
-    id: 'ann-3',
-    title: 'New Devotional Bhajan Lyrics Added to Library',
-    content: 'We have updated the Bhajan section with complete lyrics of Sarangpur Dada Thal, Mangal Murti Maruti Nandan, and full Hanuman Chalisa with font size controls for easy recitation during path.',
-    date: '2026-08-14',
-    isUrgent: false,
+    title: 'सारंगपुर धाम पदयात्रा सेवा व पंजीकरण सूचना',
+    content: 'सारंगपुर कष्टभंजन देव दर्शन पदयात्रा हेतु इच्छुक भक्तजन अपना नाम मंडल कार्यालय में दर्ज करवाएं। पदयात्रियों के भोजन व प्राथमिक उपचार की निःशुल्क व्यवस्था रहेगी।',
+    date: '2026-08-16',
     isPinned: false,
-    category: 'Bhajan',
-    author: 'Sangeet Vibhag'
+    isUrgent: false,
+    category: 'Mandal Notice',
+    author: 'कार्यालय प्रमुख'
   }
 ];
 
-export const INITIAL_ACCOUNTING_TRANSACTIONS: AccountingTransaction[] = [
+export const INITIAL_POSTS: CommunityPost[] = [
+  {
+    id: 'post-1',
+    title: 'श्री कष्टभंजन देव सारंगपुर दिव्य विचार',
+    thought: 'जिसके हृदय में श्री राम और हनुमान जी का वास है, उसे संसार का कोई भी संकट विचलित नहीं कर सकता। हर शनिवार सुंदरकांड पाठ करें और प्रभु की कृपा प्राप्त करें।\n\n॥ संकट कटे मिटे सब पीरा, जो सुमिरे हनुमत बलबीरा ॥',
+    imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+    authorName: 'श्री कष्टभंजन प्रेमी मंडल',
+    authorRole: 'मंडल परिवार',
+    date: '2026-08-20',
+    likesCount: 24,
+    tags: ['सुविचार', 'हनुमानजी', 'सारंगपुर'],
+    createdAt: '2026-08-20'
+  },
+  {
+    id: 'post-2',
+    title: 'नित्य सेवा और समर्पण का भाव',
+    thought: 'सेवा ही सबसे बड़ा धर्म है। जब हम निस्वार्थ भाव से मंडल के सुंदरकांड व अन्नक्षेत्र में सहयोग करते हैं, तो दादा कष्टभंजन हमारे जीवन के सारे कष्ट हर लेते हैं।',
+    imageUrl: 'https://images.unsplash.com/photo-1609358905581-e5382c16a815?auto=format&fit=crop&w=800&q=80',
+    authorName: 'भक्त सेवक',
+    authorRole: 'नौगामा',
+    date: '2026-08-18',
+    likesCount: 18,
+    tags: ['सेवा', 'भक्ति', 'प्रेरणा'],
+    createdAt: '2026-08-18'
+  },
+  {
+    id: 'post-3',
+    title: 'दीपक महाआरती एवं सत्संग महिमा',
+    thought: 'सत्संग से जीवन को सही दिशा मिलती है। 108 दीपक महाआरती के दर्शन मात्र से अंतर्मन में शांति और सकारात्मक ऊर्जा का संचार होता है। जय श्री कष्टभंजन दादा!',
+    imageUrl: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80',
+    authorName: 'संजय भाई पटेल',
+    authorRole: 'भक्त',
+    date: '2026-08-15',
+    likesCount: 31,
+    tags: ['महाआरती', 'सत्संग', 'जयहनुमान'],
+    createdAt: '2026-08-15'
+  }
+];
+
+export const INITIAL_TRANSACTIONS: AccountingTransaction[] = [
   {
     id: 'acc-1',
     type: 'income',
-    date: '2026-08-15',
-    amount: 25000,
-    category: 'Ceremony Sponsorship',
-    sourceOrDonor: 'Shree Nileshbhai & Bhavnaben Shah',
-    description: '51st Sunderkand Path full ceremony and prasad sponsorship contribution',
-    paymentMethod: 'UPI',
-    receiptNo: 'REC-2026-0815',
-    verifiedBy: 'Treasurer - Pravinbhai Mehta',
-    createdAt: '2026-08-15'
+    title: 'श्री सुंदरकांड पाठ हेतु गुप्त दान (भेंट)',
+    amount: 11000,
+    category: 'Donation (Bhet/Daan)',
+    date: '2026-08-19',
+    donorOrReceiverName: 'श्री राम भक्त परिवार, नौगामा',
+    paymentMode: 'UPI/Online',
+    receiptNo: 'REC-2026-089',
+    notes: '52वें सुंदरकांड पाठ महाप्रसाद हेतु भेंट',
+    recordedBy: 'Admin (Mandal Koshadhyaksh)',
+    createdAt: '2026-08-19'
   },
   {
     id: 'acc-2',
     type: 'income',
-    date: '2026-08-15',
-    amount: 18500,
-    category: 'Devotee Aarti Donations',
-    sourceOrDonor: 'General Devotees (Aarti Hundi)',
-    description: 'Aarti and Deepotsav hundi collection during 51st Sunderkand Path',
-    paymentMethod: 'Cash',
-    receiptNo: 'REC-2026-0816',
-    verifiedBy: 'Pravinbhai Mehta',
-    createdAt: '2026-08-15'
+    title: '108 दीपक महाआरती तेल व बाती सहयोग',
+    amount: 5100,
+    category: 'Sunderkand Seva',
+    date: '2026-08-18',
+    donorOrReceiverName: 'हर्षद भाई सेवक',
+    paymentMode: 'Cash',
+    receiptNo: 'REC-2026-088',
+    notes: 'दीपोत्सव व धूप सामग्री',
+    recordedBy: 'Admin',
+    createdAt: '2026-08-18'
   },
   {
     id: 'acc-3',
     type: 'expense',
-    date: '2026-08-15',
-    amount: 12500,
-    category: 'Prasad & Bhojan',
-    description: 'Mahaprasad grocery, kheer ingredients, fruits and prasad boxes',
-    paymentMethod: 'UPI',
-    voucherRef: 'VOUCH-815-01',
-    verifiedBy: 'Pravinbhai Mehta',
-    createdAt: '2026-08-15'
+    title: 'महाप्रसाद (खीर-पूरी व भोजन) सामग्री खर्च',
+    amount: 7850,
+    category: 'Prasad & Bhandara',
+    date: '2026-08-16',
+    donorOrReceiverName: 'श्रीनाथ किराना एवं डेयरी भंडार',
+    paymentMode: 'UPI/Online',
+    receiptNo: 'BILL-4421',
+    notes: '51वें पाठ के 350+ भक्तों हेतु महाप्रसाद',
+    recordedBy: 'Admin',
+    createdAt: '2026-08-16'
   },
   {
     id: 'acc-4',
     type: 'expense',
+    title: 'साउंड सिस्टम, माइक व ढोलक कलाकार मानदेय',
+    amount: 3500,
+    category: 'Sound & Dholak',
     date: '2026-08-15',
-    amount: 5500,
-    category: 'Sound System & Instruments',
-    description: 'Audio setup, microphone rentals, and harmonium tuning assistance',
-    paymentMethod: 'Cash',
-    voucherRef: 'VOUCH-815-02',
-    verifiedBy: 'Pravinbhai Mehta',
+    donorOrReceiverName: 'राधे साउंड सर्विस, नौगामा',
+    paymentMode: 'Cash',
+    receiptNo: 'VOUCH-102',
+    notes: 'सुंदरकांड संगीतमय व्यवस्था',
+    recordedBy: 'Admin',
     createdAt: '2026-08-15'
   },
   {
     id: 'acc-5',
-    type: 'expense',
-    date: '2026-08-15',
-    amount: 4000,
-    category: 'Flowers & Shringar',
-    description: 'Fresh marigold garlands, roses, and stage flower decoration',
-    paymentMethod: 'Cash',
-    voucherRef: 'VOUCH-815-03',
-    verifiedBy: 'Pravinbhai Mehta',
-    createdAt: '2026-08-15'
-  },
-  {
-    id: 'acc-6',
     type: 'income',
-    date: '2026-08-10',
-    amount: 51000,
-    category: 'Annakshetra Fund',
-    sourceOrDonor: 'Rameshwar Group of Industries',
-    description: 'Bhandara and monthly food seva sponsorship donation',
-    paymentMethod: 'Bank Transfer',
-    receiptNo: 'REC-2026-0810',
-    verifiedBy: 'Pravinbhai Mehta',
-    createdAt: '2026-08-10'
-  },
-  {
-    id: 'acc-7',
-    type: 'expense',
-    date: '2026-08-10',
-    amount: 22000,
-    category: 'Annakshetra & Bhandara',
-    description: 'Pure ghee, grains, milk and cooking utensils for hospital food seva',
-    paymentMethod: 'Cheque',
-    voucherRef: 'VOUCH-810-01',
-    verifiedBy: 'Pravinbhai Mehta',
-    createdAt: '2026-08-10'
-  },
-  {
-    id: 'acc-8',
-    type: 'income',
-    date: '2026-08-01',
-    amount: 35000,
-    category: 'Golden Jubilee Support',
-    sourceOrDonor: 'Mandal Trustee & Core Members',
-    description: '50th Sunderkand souvenir books & memento sponsorship',
-    paymentMethod: 'UPI',
-    receiptNo: 'REC-2026-0801',
-    verifiedBy: 'Pravinbhai Mehta',
-    createdAt: '2026-08-01'
-  },
-  {
-    id: 'acc-9',
-    type: 'expense',
-    date: '2026-08-01',
-    amount: 14500,
-    category: 'Printing & Books',
-    description: 'Printing of 500 gold-embossed Sunderkand Gutka and bhajan booklets',
-    paymentMethod: 'Bank Transfer',
-    voucherRef: 'VOUCH-801-01',
-    verifiedBy: 'Pravinbhai Mehta',
-    createdAt: '2026-08-01'
+    title: 'सारंगपुर पदयात्रा सेवा निधि सहयोग',
+    amount: 21000,
+    category: 'Padyatra',
+    date: '2026-08-12',
+    donorOrReceiverName: 'मण्डल हितैषी दानदाता ग्रुप',
+    paymentMode: 'Bank Transfer',
+    receiptNo: 'REC-2026-085',
+    notes: 'पदयात्रियों के जलपान व प्राथमिक चिकित्सा व्यवस्था',
+    recordedBy: 'Admin',
+    createdAt: '2026-08-12'
   }
 ];
+

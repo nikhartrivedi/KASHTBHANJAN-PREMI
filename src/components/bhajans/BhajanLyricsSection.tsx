@@ -18,7 +18,8 @@ import {
   X,
   Sparkles,
   ChevronRight,
-  Flame
+  Flame,
+  ExternalLink
 } from 'lucide-react';
 
 interface BhajanLyricsSectionProps {
@@ -157,6 +158,12 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
     setIsAddEditModalOpen(false);
   };
 
+  const openBhajanInNewTab = (bhajan: Bhajan, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const url = `/?page=bhajan-lyrics&id=${encodeURIComponent(bhajan.id)}&title=${encodeURIComponent(bhajan.title)}`;
+    window.open(url, '_blank');
+  };
+
   const filteredBhajans = bhajans.filter((b) => {
     const matchesCategory = selectedCategory === 'All' || b.category === selectedCategory;
     const matchesSearch =
@@ -248,17 +255,25 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
               <div
                 key={bhajan.id}
                 onClick={() => setSelectedBhajan(bhajan)}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                className={`p-4 rounded-2xl border transition-all cursor-pointer group ${
                   isSelected
                     ? 'bg-orange-50 border-orange-400 shadow-xs'
                     : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-stone-50'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className={`text-sm font-bold leading-snug ${isSelected ? 'text-orange-950' : 'text-stone-900'}`}>
-                      {bhajan.title}
-                    </h3>
+                  <div className="flex-1">
+                    <button
+                      type="button"
+                      onClick={(e) => openBhajanInNewTab(bhajan, e)}
+                      className="text-left font-bold leading-snug group/title flex items-center gap-1.5 hover:text-orange-600 transition-colors cursor-pointer"
+                      title="Click to open full lyrics in a new tab"
+                    >
+                      <span className={`text-sm ${isSelected ? 'text-orange-950' : 'text-stone-900'} group-hover/title:text-orange-700`}>
+                        {bhajan.title}
+                      </span>
+                      <ExternalLink className="w-3.5 h-3.5 text-orange-500 opacity-60 group-hover/title:opacity-100 shrink-0" />
+                    </button>
                     {bhajan.gujaratiTitle && (
                       <p className="text-xs text-amber-900 font-devanagari mt-0.5">
                         {bhajan.gujaratiTitle}
@@ -274,9 +289,19 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
 
                 <div className="flex items-center justify-between text-[11px] text-stone-400 mt-2.5 pt-2 border-t border-stone-100">
                   <span>{bhajan.composer || 'Traditional'}</span>
-                  {bhajan.ragaOrScale && (
-                    <span className="text-orange-700 font-medium">{bhajan.ragaOrScale}</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {bhajan.ragaOrScale && (
+                      <span className="text-orange-700 font-medium">{bhajan.ragaOrScale}</span>
+                    )}
+                    <button
+                      onClick={(e) => openBhajanInNewTab(bhajan, e)}
+                      className="p-1 rounded hover:bg-orange-100 text-orange-700 flex items-center gap-0.5 text-[10px] font-semibold"
+                      title="Open in new tab"
+                    >
+                      <span>New Tab</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -340,6 +365,15 @@ export const BhajanLyricsSection: React.FC<BhajanLyricsSectionProps> = ({ initia
                       <ZoomIn className="w-4 h-4" />
                     </button>
                   </div>
+
+                  <button
+                    onClick={() => openBhajanInNewTab(selectedBhajan)}
+                    className="p-2 bg-stone-100 hover:bg-orange-100 text-stone-700 hover:text-orange-800 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold px-3"
+                    title="Open this bhajan lyrics in a dedicated new tab"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-orange-600" />
+                    <span>Open in New Tab</span>
+                  </button>
 
                   <button
                     onClick={() => handleCopyLyrics(selectedBhajan)}

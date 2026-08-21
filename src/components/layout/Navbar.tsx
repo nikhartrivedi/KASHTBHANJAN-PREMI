@@ -6,9 +6,6 @@ import {
   Home,
   BookOpen,
   Music,
-  Calendar,
-  Image as ImageIcon,
-  DollarSign,
   ShieldCheck,
   User,
   LogIn,
@@ -19,7 +16,9 @@ import {
   Flame,
   Bell,
   Smartphone,
-  Download
+  Download,
+  MessageSquareHeart,
+  Wallet
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -42,9 +41,8 @@ export const Navbar: React.FC = () => {
     { id: 'home', label: 'Home', icon: <Home className="w-4 h-4" /> },
     { id: 'sunderkand', label: 'Sunderkand', icon: <Flame className="w-4 h-4 text-orange-500" /> },
     { id: 'bhajans', label: 'Bhajan Lyrics', icon: <Music className="w-4 h-4" /> },
-    { id: 'events', label: 'Events', icon: <Calendar className="w-4 h-4" /> },
-    { id: 'gallery', label: 'Gallery', icon: <ImageIcon className="w-4 h-4" /> },
-    { id: 'accounting', label: 'Accounting', icon: <DollarSign className="w-4 h-4 text-emerald-600" />, adminOnly: true },
+    { id: 'posts', label: 'सुविचार व फोटो (Posts)', icon: <MessageSquareHeart className="w-4 h-4 text-rose-500" /> },
+    { id: 'accounting', label: 'लेखा-जोखा (Accounting)', icon: <Wallet className="w-4 h-4 text-emerald-600" />, adminOnly: true },
     { id: 'admin-hub', label: 'Admin Hub', icon: <ShieldCheck className="w-4 h-4 text-orange-600" />, adminOnly: true }
   ];
 

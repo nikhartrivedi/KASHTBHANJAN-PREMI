@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
@@ -7,21 +7,19 @@ import { InstallApkModal } from './components/apk/InstallApkModal';
 import { HomeDashboard } from './components/home/HomeDashboard';
 import { SunderkandSection } from './components/sunderkand/SunderkandSection';
 import { BhajanLyricsSection } from './components/bhajans/BhajanLyricsSection';
-import { MandalEventsSection } from './components/events/MandalEventsSection';
-import { PhotoGallerySection } from './components/gallery/PhotoGallerySection';
-import { AccountingSection } from './components/accounting/AccountingSection';
+import { BhajanLyricsPage } from './components/bhajans/BhajanLyricsPage';
+import { CommunityPostsPage } from './components/posts/CommunityPostsPage';
+import { AccountingPage } from './components/accounting/AccountingPage';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { SunderkandCeremony, Bhajan, ActiveTab } from './types';
 import {
   Home,
   Flame,
   Music,
-  Calendar,
-  Image as ImageIcon,
-  DollarSign,
   ShieldCheck,
   CheckCircle2,
-  AlertCircle
+  MessageSquareHeart,
+  Wallet
 } from 'lucide-react';
 
 const MainAppContent: React.FC = () => {
@@ -29,6 +27,18 @@ const MainAppContent: React.FC = () => {
 
   const [selectedCeremony, setSelectedCeremony] = useState<SunderkandCeremony | undefined>(undefined);
   const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | undefined>(undefined);
+  const [isStandaloneLyricsPage, setIsStandaloneLyricsPage] = useState<boolean>(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('page') === 'bhajan-lyrics') {
+      setIsStandaloneLyricsPage(true);
+    }
+  }, []);
+
+  if (isStandaloneLyricsPage) {
+    return <BhajanLyricsPage />;
+  }
 
   const handleSelectCeremonyFromHome = (c: SunderkandCeremony) => {
     setSelectedCeremony(c);
@@ -52,7 +62,6 @@ const MainAppContent: React.FC = () => {
         {activeTab === 'home' && (
           <HomeDashboard
             onSelectCeremony={handleSelectCeremonyFromHome}
-            onSelectBhajan={handleSelectBhajanFromHome}
           />
         )}
 
@@ -64,16 +73,14 @@ const MainAppContent: React.FC = () => {
           <BhajanLyricsSection initialSelectedBhajan={selectedBhajan} />
         )}
 
-        {activeTab === 'events' && <MandalEventsSection />}
+        {activeTab === 'posts' && <CommunityPostsPage />}
 
-        {activeTab === 'gallery' && <PhotoGallerySection />}
-
-        {activeTab === 'accounting' && <AccountingSection />}
+        {activeTab === 'accounting' && <AccountingPage />}
 
         {activeTab === 'admin-hub' && <AdminDashboard />}
       </main>
 
-      {/* Mobile Bottom Navigation Bar (Ultra convenient on mobile devices) */}
+      {/* Mobile Bottom Navigation Bar */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-amber-200/90 shadow-lg px-2 py-1.5 flex justify-around items-center">
         <button
           onClick={() => { setActiveTab('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
@@ -106,34 +113,24 @@ const MainAppContent: React.FC = () => {
         </button>
 
         <button
-          onClick={() => { setActiveTab('events'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          onClick={() => { setActiveTab('posts'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
           className={`flex flex-col items-center justify-center p-1 text-[10px] font-medium transition-colors cursor-pointer ${
-            activeTab === 'events' ? 'text-orange-700 font-bold' : 'text-stone-500'
+            activeTab === 'posts' ? 'text-orange-700 font-bold' : 'text-stone-500'
           }`}
         >
-          <Calendar className="w-5 h-5 mb-0.5" />
-          <span>Events</span>
-        </button>
-
-        <button
-          onClick={() => { setActiveTab('gallery'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-          className={`flex flex-col items-center justify-center p-1 text-[10px] font-medium transition-colors cursor-pointer ${
-            activeTab === 'gallery' ? 'text-orange-700 font-bold' : 'text-stone-500'
-          }`}
-        >
-          <ImageIcon className="w-5 h-5 mb-0.5" />
-          <span>Gallery</span>
+          <MessageSquareHeart className="w-5 h-5 mb-0.5" />
+          <span>सुविचार</span>
         </button>
 
         {isAdmin && (
           <button
             onClick={() => { setActiveTab('accounting'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             className={`flex flex-col items-center justify-center p-1 text-[10px] font-medium transition-colors cursor-pointer ${
-              activeTab === 'accounting' ? 'text-emerald-700 font-bold' : 'text-emerald-600'
+              activeTab === 'accounting' ? 'text-emerald-700 font-bold' : 'text-stone-500'
             }`}
           >
-            <DollarSign className="w-5 h-5 mb-0.5" />
-            <span>Accounts</span>
+            <Wallet className="w-5 h-5 mb-0.5" />
+            <span>खाता</span>
           </button>
         )}
       </nav>

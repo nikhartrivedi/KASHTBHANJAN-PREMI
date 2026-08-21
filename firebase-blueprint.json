@@ -1,0 +1,110 @@
+{
+  "entities": {
+    "ceremonies": {
+      "title": "Sunderkand Ceremony",
+      "description": "Sunderkand Path scheduling and status",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "pathNumber": { "type": "number" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "hostName": { "type": "string" },
+        "hostPhone": { "type": "string" },
+        "hostAddress": { "type": "string" },
+        "venue": { "type": "string" },
+        "notes": { "type": "string" },
+        "status": { "type": "string" },
+        "bannerUrl": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "pathNumber", "date", "time", "venue", "status"]
+    },
+    "bhajans": {
+      "title": "Bhajan",
+      "description": "Bhajan lyrics and audio links",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "lyrics": { "type": "string" },
+        "audioUrl": { "type": "string" },
+        "youtubeUrl": { "type": "string" },
+        "tags": { "type": "array" },
+        "author": { "type": "string" },
+        "dateAdded": { "type": "string" }
+      },
+      "required": ["title", "category", "lyrics"]
+    },
+    "announcements": {
+      "title": "Announcement",
+      "description": "Mandal notices and announcements",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string" },
+        "date": { "type": "string" },
+        "isPinned": { "type": "boolean" },
+        "isUrgent": { "type": "boolean" },
+        "author": { "type": "string" }
+      },
+      "required": ["title", "content", "category", "date"]
+    },
+    "posts": {
+      "title": "Community Post",
+      "description": "Devotional quotes and photos",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorRole": { "type": "string" },
+        "likes": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "tag": { "type": "string" }
+      },
+      "required": ["title", "content", "authorName"]
+    },
+    "transactions": {
+      "title": "Accounting Transaction",
+      "description": "Income and expense transactions for Mandal accounting",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "amount": { "type": "number" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string" },
+        "recordedBy": { "type": "string" },
+        "paymentMode": { "type": "string" },
+        "receiptNo": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["type", "amount", "category", "description", "date", "paymentMode"]
+    }
+  },
+  "firestore": {
+    "/ceremonies/{ceremonyId}": {
+      "schema": "ceremonies",
+      "description": "Sunderkand ceremony paths"
+    },
+    "/bhajans/{bhajanId}": {
+      "schema": "bhajans",
+      "description": "Bhajan library records"
+    },
+    "/announcements/{announcementId}": {
+      "schema": "announcements",
+      "description": "Mandal announcements and alerts"
+    },
+    "/posts/{postId}": {
+      "schema": "posts",
+      "description": "Community posts and photos"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "transactions",
+      "description": "Mandal accounting transactions"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Announcement } from '../../types';
 import { DiyaIcon } from '../common/DevotionalIcons';
@@ -6,9 +6,6 @@ import {
   ShieldCheck,
   Flame,
   Music,
-  Calendar,
-  Image as ImageIcon,
-  DollarSign,
   Bell,
   Plus,
   Edit2,
@@ -18,9 +15,12 @@ import {
   CheckCircle2,
   X,
   ArrowRight,
-  TrendingUp,
-  Wallet,
-  Settings
+  Download,
+  Upload,
+  Database,
+  RefreshCw,
+  MessageSquareHeart,
+  Wallet
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -28,17 +28,21 @@ export const AdminDashboard: React.FC = () => {
     isAdmin,
     ceremonies,
     bhajans,
-    events,
-    photoCollections,
     announcements,
+    posts,
     transactions,
     addAnnouncement,
     updateAnnouncement,
     deleteAnnouncement,
     setActiveTab,
     setIsAuthModalOpen,
-    showToast
+    showToast,
+    exportAllData,
+    importAllData,
+    resetToDefaults
   } = useApp();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Announcement modal
   const [isAnnModalOpen, setIsAnnModalOpen] = useState(false);
@@ -75,9 +79,6 @@ export const AdminDashboard: React.FC = () => {
 
   // Stats calculation
   const upcomingCeremoniesCount = ceremonies.filter((c) => c.status === 'upcoming').length;
-  const totalIncome = transactions.filter((t) => t.type === 'income').reduce((sum, t) => sum + Number(t.amount || 0), 0);
-  const totalExpense = transactions.filter((t) => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount || 0), 0);
-  const balance = totalIncome - totalExpense;
 
   const openAddAnnModal = () => {
     setEditingAnn(null);
@@ -140,7 +141,7 @@ export const AdminDashboard: React.FC = () => {
             Kashtabhanjan Premi Admin
           </h1>
           <p className="text-xs sm:text-sm text-amber-100 mt-1">
-            Complete control over Sunderkand path schedules, bhajan sangrah, events, photo gallery, notices, and financial ledgers.
+            Complete control over Sunderkand path schedules, bhajan lyrics sangrah, and notices.
           </p>
         </div>
 
@@ -154,7 +155,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Quick Statistics Overview Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
         {/* Sunderkand Stat */}
         <div
           onClick={() => setActiveTab('sunderkand')}
@@ -178,59 +179,46 @@ export const AdminDashboard: React.FC = () => {
             <Music className="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" />
           </div>
           <p className="text-xl font-bold text-stone-900">{bhajans.length}</p>
-          <span className="text-[10px] text-stone-500">Lyrics in Sangrah</span>
+          <span className="text-[10px] text-stone-500">Lyrics Library</span>
         </div>
 
-        {/* Events Stat */}
+        {/* Posts Stat */}
         <div
-          onClick={() => setActiveTab('events')}
+          onClick={() => setActiveTab('posts')}
           className="bg-white p-4 rounded-2xl border border-amber-200 shadow-xs hover:border-orange-400 transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between text-stone-400 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-orange-700">Events</span>
-            <Calendar className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-orange-700">सुविचार/Posts</span>
+            <MessageSquareHeart className="w-4 h-4 text-rose-500 group-hover:scale-110 transition-transform" />
           </div>
-          <p className="text-xl font-bold text-stone-900">{events.length}</p>
-          <span className="text-[10px] text-stone-500">Mandal Activities</span>
+          <p className="text-xl font-bold text-stone-900">{posts.length}</p>
+          <span className="text-[10px] text-stone-500">Community Posts</span>
         </div>
 
-        {/* Photo Albums Stat */}
-        <div
-          onClick={() => setActiveTab('gallery')}
-          className="bg-white p-4 rounded-2xl border border-amber-200 shadow-xs hover:border-orange-400 transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between text-stone-400 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-orange-700">Gallery</span>
-            <ImageIcon className="w-4 h-4 text-purple-500 group-hover:scale-110 transition-transform" />
-          </div>
-          <p className="text-xl font-bold text-stone-900">{photoCollections.length}</p>
-          <span className="text-[10px] text-stone-500">Albums Published</span>
-        </div>
-
-        {/* Total Income */}
+        {/* Accounting Stat */}
         <div
           onClick={() => setActiveTab('accounting')}
-          className="bg-white p-4 rounded-2xl border border-emerald-200 shadow-xs hover:border-emerald-400 transition-all cursor-pointer group"
+          className="bg-white p-4 rounded-2xl border border-emerald-200 shadow-xs hover:border-emerald-500 transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between text-stone-400 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Income</span>
-            <TrendingUp className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">लेखा-जोखा</span>
+            <Wallet className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
           </div>
-          <p className="text-base sm:text-lg font-bold text-stone-900 truncate">₹{(totalIncome / 1000).toFixed(1)}k</p>
-          <span className="text-[10px] text-emerald-600 font-medium">Seva / Donations</span>
+          <p className="text-xl font-bold text-emerald-800">{transactions.length}</p>
+          <span className="text-[10px] text-emerald-600 font-semibold">आय-व्यय बहीखाता</span>
         </div>
 
-        {/* Net Balance */}
+        {/* Notices Stat */}
         <div
-          onClick={() => setActiveTab('accounting')}
-          className="bg-white p-4 rounded-2xl border border-amber-200 shadow-xs hover:border-amber-400 transition-all cursor-pointer group"
+          onClick={openAddAnnModal}
+          className="bg-white p-4 rounded-2xl border border-amber-200 shadow-xs hover:border-orange-400 transition-all cursor-pointer group col-span-2 sm:col-span-1"
         >
           <div className="flex items-center justify-between text-stone-400 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800">Balance</span>
-            <Wallet className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-orange-700">Notices</span>
+            <Bell className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
           </div>
-          <p className="text-base sm:text-lg font-bold text-orange-800 truncate">₹{(balance / 1000).toFixed(1)}k</p>
-          <span className="text-[10px] text-stone-500">Available Funds</span>
+          <p className="text-xl font-bold text-stone-900">{announcements.length}</p>
+          <span className="text-[10px] text-stone-500">Active Notices</span>
         </div>
       </div>
 
@@ -246,7 +234,7 @@ export const AdminDashboard: React.FC = () => {
                 Announcements & Notices ({announcements.length})
               </h3>
               <p className="text-xs text-stone-500">
-                Broadcast ceremony timings, padyatra alerts, and Mandal notices
+                Broadcast ceremony timings and Mandal notices
               </p>
             </div>
           </div>
@@ -323,32 +311,21 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Launchpad to all Mandal Sections */}
+      {/* Quick Launchpad */}
       <div className="bg-white p-6 rounded-3xl border border-amber-200/90 shadow-xs space-y-4">
         <h3 className="font-serif-devotional text-lg font-bold text-stone-900">
           Management Launchpad
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <button
             onClick={() => setActiveTab('sunderkand')}
             className="p-4 rounded-2xl bg-orange-50/60 hover:bg-orange-100/60 border border-orange-200/80 text-left transition-all cursor-pointer flex items-center justify-between group"
           >
             <div>
               <h4 className="text-sm font-bold text-stone-900 group-hover:text-orange-800">Manage Sunderkand</h4>
-              <p className="text-xs text-stone-500 mt-0.5">Schedule path, edit venue, upload photos</p>
+              <p className="text-xs text-stone-500 mt-0.5">Schedule path, edit venue, update timings</p>
             </div>
             <ArrowRight className="w-4 h-4 text-orange-600 group-hover:translate-x-1 transition-transform" />
-          </button>
-
-          <button
-            onClick={() => setActiveTab('accounting')}
-            className="p-4 rounded-2xl bg-emerald-50/60 hover:bg-emerald-100/60 border border-emerald-200/80 text-left transition-all cursor-pointer flex items-center justify-between group"
-          >
-            <div>
-              <h4 className="text-sm font-bold text-stone-900 group-hover:text-emerald-800">Mandal Accounting</h4>
-              <p className="text-xs text-stone-500 mt-0.5">Record income, expenses, export ledger</p>
-            </div>
-            <ArrowRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-1 transition-transform" />
           </button>
 
           <button
@@ -364,87 +341,195 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* ANNOUNCEMENT MODAL */}
+      {/* Data Backup, Permanent Storage & Restore Section */}
+      <div className="bg-linear-to-br from-amber-500/10 via-orange-500/10 to-amber-600/10 p-6 sm:p-7 rounded-3xl border-2 border-amber-300/80 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-amber-200/80">
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 bg-amber-600 text-white rounded-2xl shadow-xs">
+              <Database className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-serif-devotional text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2">
+                <span>डेटा सुरक्षा व बैकअप (Data Persistence & Backup)</span>
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
+                  ✓ Auto-Saved
+                </span>
+              </h3>
+              <p className="text-xs text-stone-600">
+                साइट पर किया गया हर बदलाव (सुंदरकांड, भजन, नोटिस) तुरंत ब्राउज़र में सुरक्षित (Auto-Save) रहता है। आप कभी भी पूरा डेटा JSON बैकअप में डाउनलोड या रीस्टोर कर सकते हैं।
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+          {/* Download Backup */}
+          <button
+            onClick={exportAllData}
+            className="p-4 rounded-2xl bg-white hover:bg-orange-50 border border-orange-200 text-left transition-all shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between space-y-2 group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="p-2 bg-orange-100 text-orange-700 rounded-xl group-hover:scale-110 transition-transform">
+                <Download className="w-4 h-4" />
+              </span>
+              <span className="text-[10px] font-bold text-orange-600 uppercase tracking-wider">Export JSON</span>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-stone-900">डाउनलोड बैकअप (Export)</h4>
+              <p className="text-xs text-stone-500 mt-0.5">सभी रिकॉर्ड्स को एक सुरक्षित .json फ़ाइल में सहेजें</p>
+            </div>
+          </button>
+
+          {/* Import Backup */}
+          <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50 border border-emerald-200 text-left transition-all shadow-xs hover:shadow-md flex flex-col justify-between space-y-2 group">
+            <div className="flex items-center justify-between">
+              <span className="p-2 bg-emerald-100 text-emerald-700 rounded-xl group-hover:scale-110 transition-transform">
+                <Upload className="w-4 h-4" />
+              </span>
+              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Import JSON</span>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-stone-900">रीस्टोर बैकअप (Import)</h4>
+              <p className="text-xs text-stone-500 mt-0.5">किसी भी डिवाइस से पहले का बैकअप लोड करें</p>
+            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".json"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    const content = event.target?.result as string;
+                    if (content) {
+                      importAllData(content);
+                    }
+                  };
+                  reader.readAsText(file);
+                  // Reset input
+                  e.target.value = '';
+                }
+              }}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs cursor-pointer text-center"
+            >
+              Select Backup File (.json)
+            </button>
+          </div>
+
+          {/* Reset to Default */}
+          <div className="p-4 rounded-2xl bg-white hover:bg-rose-50 border border-rose-200 text-left transition-all shadow-xs hover:shadow-md flex flex-col justify-between space-y-2 group">
+            <div className="flex items-center justify-between">
+              <span className="p-2 bg-rose-100 text-rose-700 rounded-xl group-hover:scale-110 transition-transform">
+                <RefreshCw className="w-4 h-4" />
+              </span>
+              <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Reset</span>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-stone-900">डिफ़ॉल्ट रीसेट (Reset)</h4>
+              <p className="text-xs text-stone-500 mt-0.5">डेटा को मूल डिफ़ॉल्ट स्थिति में रीसेट करें</p>
+            </div>
+            <button
+              onClick={resetToDefaults}
+              className="w-full py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-xs cursor-pointer text-center"
+            >
+              Reset to Defaults
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Announcement Create/Edit Modal */}
       {isAnnModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-amber-200">
-            <div className="bg-linear-to-r from-orange-600 via-amber-600 to-orange-700 p-6 text-white flex items-center justify-between">
-              <div>
-                <h3 className="font-serif-devotional text-xl font-bold">
-                  {editingAnn ? 'Edit Announcement' : 'Post Mandal Notice'}
-                </h3>
-                <p className="text-xs text-amber-100 mt-0.5">
-                  Visible prominently on the home page for all devotees
-                </p>
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-amber-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+              <h3 className="font-serif-devotional text-lg font-bold text-stone-900">
+                {editingAnn ? 'Edit Notice' : 'Post New Notice'}
+              </h3>
               <button
                 onClick={() => setIsAnnModalOpen(false)}
-                className="p-1.5 bg-white/20 hover:bg-white/30 rounded-full text-white transition-colors"
+                className="p-1 rounded-full text-stone-400 hover:text-stone-700 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleAnnSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleAnnSubmit} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">
-                  Announcement Title *
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Title / शीर्षक *
                 </label>
                 <input
                   type="text"
                   required
+                  placeholder="e.g. आगामी शनिवार सुंदरकांड पाठ समय परिवर्तन सूचना"
                   value={annForm.title}
                   onChange={(e) => setAnnForm({ ...annForm, title: e.target.value })}
-                  placeholder="e.g. Next Sunderkand Timing Update"
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none"
+                  className="w-full px-3.5 py-2 text-xs border border-stone-300 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">
-                  Message Content *
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Category *
+                </label>
+                <select
+                  value={annForm.category}
+                  onChange={(e) => setAnnForm({ ...annForm, category: e.target.value as any })}
+                  className="w-full px-3.5 py-2 text-xs border border-stone-300 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none"
+                >
+                  <option value="Sunderkand">Sunderkand</option>
+                  <option value="Bhajan">Bhajan</option>
+                  <option value="Mandal Notice">Mandal Notice</option>
+                  <option value="Important">Important</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1">
+                  Announcement Details / संदेश *
                 </label>
                 <textarea
                   required
-                  rows={4}
+                  rows={3}
+                  placeholder="Enter notice details for bhaktas..."
                   value={annForm.content}
                   onChange={(e) => setAnnForm({ ...annForm, content: e.target.value })}
-                  placeholder="Type the notice message..."
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none"
+                  className="w-full px-3.5 py-2 text-xs border border-stone-300 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Category
-                  </label>
-                  <select
-                    value={annForm.category}
-                    onChange={(e) => setAnnForm({ ...annForm, category: e.target.value as Announcement['category'] })}
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none"
-                  >
-                    <option value="Sunderkand">Sunderkand</option>
-                    <option value="Bhajan">Bhajan</option>
-                    <option value="Mandal Notice">Mandal Notice</option>
-                    <option value="Important">Important</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
                     Date
                   </label>
                   <input
                     type="date"
                     value={annForm.date}
                     onChange={(e) => setAnnForm({ ...annForm, date: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:border-orange-500 outline-none"
+                    className="w-full px-3.5 py-2 text-xs border border-stone-300 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Issued By
+                  </label>
+                  <input
+                    type="text"
+                    value={annForm.author}
+                    onChange={(e) => setAnnForm({ ...annForm, author: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs border border-stone-300 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-2">
+              <div className="flex items-center space-x-6 pt-2">
                 <label className="flex items-center space-x-2 text-xs font-medium text-stone-700 cursor-pointer">
                   <input
                     type="checkbox"
@@ -452,7 +537,7 @@ export const AdminDashboard: React.FC = () => {
                     onChange={(e) => setAnnForm({ ...annForm, isPinned: e.target.checked })}
                     className="rounded text-orange-600 focus:ring-orange-500"
                   />
-                  <span>Pin to Top of Home</span>
+                  <span>Pin to Top</span>
                 </label>
 
                 <label className="flex items-center space-x-2 text-xs font-medium text-stone-700 cursor-pointer">
@@ -460,25 +545,25 @@ export const AdminDashboard: React.FC = () => {
                     type="checkbox"
                     checked={annForm.isUrgent}
                     onChange={(e) => setAnnForm({ ...annForm, isUrgent: e.target.checked })}
-                    className="rounded text-rose-600 focus:ring-rose-500"
+                    className="rounded text-red-600 focus:ring-red-500"
                   />
-                  <span className="text-rose-700 font-semibold">Mark as Urgent Alert</span>
+                  <span className="text-red-700 font-semibold">Mark Urgent</span>
                 </label>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-stone-200">
+              <div className="pt-3 flex justify-end space-x-2 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => setIsAnnModalOpen(false)}
-                  className="px-4 py-2.5 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl"
+                  className="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold rounded-xl shadow-md"
+                  className="px-5 py-2 text-xs font-semibold bg-orange-600 hover:bg-orange-700 text-white rounded-xl shadow-md cursor-pointer"
                 >
-                  {editingAnn ? 'Save Changes' : 'Publish Announcement'}
+                  {editingAnn ? 'Save Changes' : 'Post Announcement'}
                 </button>
               </div>
             </form>
@@ -488,3 +573,4 @@ export const AdminDashboard: React.FC = () => {
     </div>
   );
 };
+

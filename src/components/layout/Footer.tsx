@@ -70,22 +70,6 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <button
-                  onClick={() => { setActiveTab('events'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  className="hover:text-amber-400 transition-colors cursor-pointer"
-                >
-                  Mandal Events & Padyatra
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => { setActiveTab('gallery'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  className="hover:text-amber-400 transition-colors cursor-pointer"
-                >
-                  Photo Gallery & Darshan
-                </button>
-              </li>
-              <li>
-                <button
                   onClick={() => setIsApkModalOpen(true)}
                   className="text-amber-400 font-semibold hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
                 >
@@ -164,21 +148,24 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom copyright & Demo Reset */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-3">
+        {/* Bottom copyright & Data Status */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-400 gap-3 border-t border-stone-800 pt-6">
           <p>© {new Date().getFullYear()} SHREE KASHTBHANJAN PREMI, Nougama. All rights reserved. Jay Shree Kashtabhanjan Dev.</p>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 text-[11px] font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>All Changes Auto-Saved</span>
+            </span>
+            <span>•</span>
             <button
-              onClick={resetToDefaults}
-              className="flex items-center space-x-1 text-stone-400 hover:text-amber-400 transition-colors cursor-pointer"
-              title="Reset data to initial authentic sample records"
+              onClick={() => setActiveTab('admin-hub')}
+              className="text-stone-300 hover:text-amber-300 transition-colors cursor-pointer text-[11px]"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Sample Records</span>
+              डेटा बैकअप (Backup Data)
             </button>
             <span>•</span>
-            <span className="text-amber-500/80 font-medium">Nougama, Banswara, Rajasthan</span>
+            <span className="text-amber-400 font-medium">Nougama, Banswara</span>
           </div>
         </div>
       </div>

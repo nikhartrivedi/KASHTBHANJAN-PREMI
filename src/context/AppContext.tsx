@@ -1,22 +1,29 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
+  collection,
+  doc,
+  setDoc,
+  deleteDoc,
+  onSnapshot,
+  getDocs,
+  writeBatch
+} from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import {
   User,
-  UserRole,
   ActiveTab,
   SunderkandCeremony,
   Bhajan,
-  MandalEvent,
-  PhotoCollection,
   Announcement,
+  CommunityPost,
   AccountingTransaction
 } from '../types';
 import {
   INITIAL_SUNDERKAND_CEREMONIES,
   INITIAL_BHAJANS,
-  INITIAL_MANDAL_EVENTS,
-  INITIAL_PHOTO_COLLECTIONS,
   INITIAL_ANNOUNCEMENTS,
-  INITIAL_ACCOUNTING_TRANSACTIONS
+  INITIAL_POSTS,
+  INITIAL_TRANSACTIONS
 } from '../data/initialData';
 
 interface AppContextType {
@@ -35,39 +42,34 @@ interface AppContextType {
   // Sunderkand
   ceremonies: SunderkandCeremony[];
   nextSunderkand: SunderkandCeremony | undefined;
-  addCeremony: (ceremony: Omit<SunderkandCeremony, 'id' | 'createdAt'>) => void;
-  updateCeremony: (ceremony: SunderkandCeremony) => void;
-  deleteCeremony: (id: string) => void;
+  addCeremony: (ceremony: Omit<SunderkandCeremony, 'id' | 'createdAt'>) => Promise<void>;
+  updateCeremony: (ceremony: SunderkandCeremony) => Promise<void>;
+  deleteCeremony: (id: string) => Promise<void>;
 
   // Bhajans
   bhajans: Bhajan[];
-  addBhajan: (bhajan: Omit<Bhajan, 'id' | 'dateAdded'>) => void;
-  updateBhajan: (bhajan: Bhajan) => void;
-  deleteBhajan: (id: string) => void;
-
-  // Events
-  events: MandalEvent[];
-  addEvent: (event: Omit<MandalEvent, 'id'>) => void;
-  updateEvent: (event: MandalEvent) => void;
-  deleteEvent: (id: string) => void;
-
-  // Gallery
-  photoCollections: PhotoCollection[];
-  addPhotoCollection: (collection: Omit<PhotoCollection, 'id'>) => void;
-  updatePhotoCollection: (collection: PhotoCollection) => void;
-  deletePhotoCollection: (id: string) => void;
+  addBhajan: (bhajan: Omit<Bhajan, 'id' | 'dateAdded'>) => Promise<void>;
+  updateBhajan: (bhajan: Bhajan) => Promise<void>;
+  deleteBhajan: (id: string) => Promise<void>;
 
   // Announcements
   announcements: Announcement[];
-  addAnnouncement: (announcement: Omit<Announcement, 'id'>) => void;
-  updateAnnouncement: (announcement: Announcement) => void;
-  deleteAnnouncement: (id: string) => void;
+  addAnnouncement: (announcement: Omit<Announcement, 'id'>) => Promise<void>;
+  updateAnnouncement: (announcement: Announcement) => Promise<void>;
+  deleteAnnouncement: (id: string) => Promise<void>;
 
-  // Accounting (Admin only)
+  // Community Posts / Acche Vichar
+  posts: CommunityPost[];
+  addPost: (post: Omit<CommunityPost, 'id' | 'createdAt'>) => Promise<void>;
+  updatePost: (post: CommunityPost) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
+  likePost: (id: string) => Promise<void>;
+
+  // Accounting Transactions (Admin Only)
   transactions: AccountingTransaction[];
-  addTransaction: (transaction: Omit<AccountingTransaction, 'id' | 'createdAt'>) => void;
-  updateTransaction: (transaction: AccountingTransaction) => void;
-  deleteTransaction: (id: string) => void;
+  addTransaction: (transaction: Omit<AccountingTransaction, 'id' | 'createdAt'>) => Promise<void>;
+  updateTransaction: (transaction: AccountingTransaction) => Promise<void>;
+  deleteTransaction: (id: string) => Promise<void>;
   
   // Global search
   searchQuery: string;
@@ -77,20 +79,26 @@ interface AppContextType {
   toastMessage: string | null;
   showToast: (msg: string) => void;
 
+  // Cloud status
+  isCloudSynced: boolean;
+
   // Reset to initial demo data
-  resetToDefaults: () => void;
+  resetToDefaults: () => Promise<void>;
+
+  // Permanent Backup and Restore
+  exportAllData: () => void;
+  importAllData: (jsonData: string) => Promise<boolean>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
-  USER: 'kp_user',
-  CEREMONIES: 'kp_ceremonies_v1',
-  BHAJANS: 'kp_bhajans_v1',
-  EVENTS: 'kp_events_v1',
-  GALLERY: 'kp_gallery_v1',
-  ANNOUNCEMENTS: 'kp_announcements_v1',
-  TRANSACTIONS: 'kp_transactions_v1',
+  USER: 'kp_user_v2',
+  CEREMONIES: 'kp_ceremonies_v2',
+  BHAJANS: 'kp_bhajans_v2',
+  ANNOUNCEMENTS: 'kp_announcements_v2',
+  POSTS: 'kp_posts_v2',
+  TRANSACTIONS: 'kp_transactions_v2',
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -114,17 +122,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isApkModalOpen, setIsApkModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isCloudSynced, setIsCloudSynced] = useState<boolean>(false);
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage((current) => (current === msg ? null : current));
-    }, 3500);
-  };
-
-  // Data states with localStorage persistence
+  // Data states with fallback to initial data
   const [ceremonies, setCeremonies] = useState<SunderkandCeremony[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.CEREMONIES);
     return saved ? JSON.parse(saved) : INITIAL_SUNDERKAND_CEREMONIES;
@@ -135,24 +137,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_BHAJANS;
   });
 
-  const [events, setEvents] = useState<MandalEvent[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.EVENTS);
-    return saved ? JSON.parse(saved) : INITIAL_MANDAL_EVENTS;
-  });
-
-  const [photoCollections, setPhotoCollections] = useState<PhotoCollection[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.GALLERY);
-    return saved ? JSON.parse(saved) : INITIAL_PHOTO_COLLECTIONS;
-  });
-
   const [announcements, setAnnouncements] = useState<Announcement[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.ANNOUNCEMENTS);
     return saved ? JSON.parse(saved) : INITIAL_ANNOUNCEMENTS;
   });
 
+  const [posts, setPosts] = useState<CommunityPost[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.POSTS);
+    return saved ? JSON.parse(saved) : INITIAL_POSTS;
+  });
+
   const [transactions, setTransactions] = useState<AccountingTransaction[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
-    return saved ? JSON.parse(saved) : INITIAL_ACCOUNTING_TRANSACTIONS;
+    return saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
   });
 
   // Sync to local storage
@@ -169,39 +166,156 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [bhajans]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
-  }, [events]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.GALLERY, JSON.stringify(photoCollections));
-  }, [photoCollections]);
-
-  useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify(announcements));
   }, [announcements]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(posts));
+  }, [posts]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(transactions));
   }, [transactions]);
 
+  // Real-time Cloud Sync with Firebase Firestore
+  useEffect(() => {
+    // Sunderkand Ceremonies Listener
+    const unsubCeremonies = onSnapshot(
+      collection(db, 'ceremonies'),
+      (snapshot) => {
+        if (!snapshot.empty) {
+          const list = snapshot.docs.map((docSnap) => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          })) as SunderkandCeremony[];
+          setCeremonies(list);
+          setIsCloudSynced(true);
+        } else {
+          // Initialize cloud collection with seed data if empty
+          INITIAL_SUNDERKAND_CEREMONIES.forEach(async (c) => {
+            await setDoc(doc(db, 'ceremonies', c.id), c);
+          });
+        }
+      },
+      (error) => {
+        console.warn('Firestore Ceremonies snapshot error:', error);
+      }
+    );
+
+    // Bhajans Listener
+    const unsubBhajans = onSnapshot(
+      collection(db, 'bhajans'),
+      (snapshot) => {
+        if (!snapshot.empty) {
+          const list = snapshot.docs.map((docSnap) => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          })) as Bhajan[];
+          setBhajans(list);
+          setIsCloudSynced(true);
+        } else {
+          INITIAL_BHAJANS.forEach(async (b) => {
+            await setDoc(doc(db, 'bhajans', b.id), b);
+          });
+        }
+      },
+      (error) => {
+        console.warn('Firestore Bhajans snapshot error:', error);
+      }
+    );
+
+    // Announcements Listener
+    const unsubAnnouncements = onSnapshot(
+      collection(db, 'announcements'),
+      (snapshot) => {
+        if (!snapshot.empty) {
+          const list = snapshot.docs.map((docSnap) => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          })) as Announcement[];
+          setAnnouncements(list);
+          setIsCloudSynced(true);
+        } else {
+          INITIAL_ANNOUNCEMENTS.forEach(async (a) => {
+            await setDoc(doc(db, 'announcements', a.id), a);
+          });
+        }
+      },
+      (error) => {
+        console.warn('Firestore Announcements snapshot error:', error);
+      }
+    );
+
+    // Posts Listener (Acche Vichar & Photos)
+    const unsubPosts = onSnapshot(
+      collection(db, 'posts'),
+      (snapshot) => {
+        if (!snapshot.empty) {
+          const list = snapshot.docs.map((docSnap) => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          })) as CommunityPost[];
+          setPosts(list);
+          setIsCloudSynced(true);
+        } else {
+          INITIAL_POSTS.forEach(async (p) => {
+            await setDoc(doc(db, 'posts', p.id), p);
+          });
+        }
+      },
+      (error) => {
+        console.warn('Firestore Posts snapshot error:', error);
+      }
+    );
+
+    // Transactions Listener (Accounting - Aavak & Jaavak)
+    const unsubTransactions = onSnapshot(
+      collection(db, 'transactions'),
+      (snapshot) => {
+        if (!snapshot.empty) {
+          const list = snapshot.docs.map((docSnap) => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          })) as AccountingTransaction[];
+          setTransactions(list);
+          setIsCloudSynced(true);
+        } else {
+          INITIAL_TRANSACTIONS.forEach(async (t) => {
+            await setDoc(doc(db, 'transactions', t.id), t);
+          });
+        }
+      },
+      (error) => {
+        console.warn('Firestore Transactions snapshot error:', error);
+      }
+    );
+
+    return () => {
+      unsubCeremonies();
+      unsubBhajans();
+      unsubAnnouncements();
+      unsubPosts();
+      unsubTransactions();
+    };
+  }, []);
+
   // Auth methods
   const isAdmin = user.role === 'admin';
 
-  const loginAsAdmin = (password?: string) => {
-    // Demo admin authentication - supports "admin" or "kashta123" or default one-click
-    if (!password || password.trim().toLowerCase() === 'kashta123' || password.trim().toLowerCase() === 'admin') {
+  const loginAsAdmin = (password?: string): boolean => {
+    if (password === 'Premi@7252') {
       const adminUser: User = {
         id: 'admin-1',
-        name: 'Mandal Administrator',
+        name: 'Mandal Admin',
         role: 'admin',
-        email: 'admin@kashtabhanjanpremi.org',
-        phone: '+91 98250 99999'
+        phone: '+91 77329 43851'
       };
       setUser(adminUser);
       setIsAuthModalOpen(false);
-      showToast('Jai Kashtabhanjan Dev! Admin Login Successful');
+      showToast('Admin logged in successfully!');
       return true;
     }
+    showToast('अमान्य एडमिन पासवर्ड (Invalid Admin Password)');
     return false;
   };
 
@@ -213,163 +327,372 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setUser(guestUser);
     setIsAuthModalOpen(false);
-    showToast('Browsing as Devotee Guest');
+    showToast('Welcome Devotee!');
   };
 
   const logout = () => {
     setUser({
-      id: 'guest-1',
+      id: 'guest-' + Date.now(),
       name: 'Devotee Guest',
       role: 'guest'
     });
-    if (activeTab === 'accounting' || activeTab === 'admin-hub') {
-      setActiveTab('home');
-    }
-    showToast('Logged out successfully');
+    showToast('Logged out.');
   };
 
-  // Next Sunderkand helper
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3500);
+  };
+
+  // Next upcoming Sunderkand calculation
   const nextSunderkand = ceremonies
     .filter((c) => c.status === 'upcoming')
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
 
-  // Sunderkand operations
-  const addCeremony = (ceremonyData: Omit<SunderkandCeremony, 'id' | 'createdAt'>) => {
+  // Sunderkand operations with Cloud Firestore + Local Fallback
+  const addCeremony = async (ceremonyData: Omit<SunderkandCeremony, 'id' | 'createdAt'>) => {
+    const newId = 'sund-' + Date.now();
     const newCeremony: SunderkandCeremony = {
       ...ceremonyData,
-      id: 'sund-' + Date.now(),
-      createdAt: new Date().toISOString().split('T')[0]
+      id: newId,
+      createdAt: new Date().toISOString()
     };
+    // Optimistic local update
     setCeremonies((prev) => [newCeremony, ...prev]);
-    showToast('Sunderkand ceremony created successfully!');
+    showToast('Sunderkand ceremony scheduled & saving to Cloud...');
+
+    try {
+      await setDoc(doc(db, 'ceremonies', newId), newCeremony);
+      showToast('☁️ Sunderkand saved to Google Firebase Firestore!');
+    } catch (err) {
+      console.error('Firestore addCeremony error:', err);
+    }
   };
 
-  const updateCeremony = (ceremony: SunderkandCeremony) => {
+  const updateCeremony = async (ceremony: SunderkandCeremony) => {
     setCeremonies((prev) => prev.map((c) => (c.id === ceremony.id ? ceremony : c)));
-    showToast('Ceremony details updated!');
+    showToast('Sunderkand details updated!');
+
+    try {
+      await setDoc(doc(db, 'ceremonies', ceremony.id), ceremony);
+    } catch (err) {
+      console.error('Firestore updateCeremony error:', err);
+    }
   };
 
-  const deleteCeremony = (id: string) => {
+  const deleteCeremony = async (id: string) => {
     setCeremonies((prev) => prev.filter((c) => c.id !== id));
-    showToast('Ceremony removed.');
+    showToast('Sunderkand ceremony removed.');
+
+    try {
+      await deleteDoc(doc(db, 'ceremonies', id));
+    } catch (err) {
+      console.error('Firestore deleteCeremony error:', err);
+    }
   };
 
-  // Bhajan operations
-  const addBhajan = (bhajanData: Omit<Bhajan, 'id' | 'dateAdded'>) => {
+  // Bhajan operations with Cloud Firestore
+  const addBhajan = async (bhajanData: Omit<Bhajan, 'id' | 'dateAdded'>) => {
+    const newId = 'bhajan-' + Date.now();
     const newBhajan: Bhajan = {
       ...bhajanData,
-      id: 'bhajan-' + Date.now(),
-      dateAdded: new Date().toISOString().split('T')[0]
+      id: newId,
+      dateAdded: new Date().toISOString()
     };
     setBhajans((prev) => [newBhajan, ...prev]);
-    showToast('New Bhajan lyrics published!');
+    showToast('Bhajan added to library!');
+
+    try {
+      await setDoc(doc(db, 'bhajans', newId), newBhajan);
+      showToast('☁️ Bhajan synced to Google Firestore!');
+    } catch (err) {
+      console.error('Firestore addBhajan error:', err);
+    }
   };
 
-  const updateBhajan = (bhajan: Bhajan) => {
+  const updateBhajan = async (bhajan: Bhajan) => {
     setBhajans((prev) => prev.map((b) => (b.id === bhajan.id ? bhajan : b)));
     showToast('Bhajan updated successfully!');
+
+    try {
+      await setDoc(doc(db, 'bhajans', bhajan.id), bhajan);
+    } catch (err) {
+      console.error('Firestore updateBhajan error:', err);
+    }
   };
 
-  const deleteBhajan = (id: string) => {
+  const deleteBhajan = async (id: string) => {
     setBhajans((prev) => prev.filter((b) => b.id !== id));
     showToast('Bhajan deleted.');
+
+    try {
+      await deleteDoc(doc(db, 'bhajans', id));
+    } catch (err) {
+      console.error('Firestore deleteBhajan error:', err);
+    }
   };
 
-  // Event operations
-  const addEvent = (eventData: Omit<MandalEvent, 'id'>) => {
-    const newEvent: MandalEvent = {
-      ...eventData,
-      id: 'event-' + Date.now()
-    };
-    setEvents((prev) => [newEvent, ...prev]);
-    showToast('Mandal event added!');
-  };
-
-  const updateEvent = (event: MandalEvent) => {
-    setEvents((prev) => prev.map((e) => (e.id === event.id ? event : e)));
-    showToast('Event updated!');
-  };
-
-  const deleteEvent = (id: string) => {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
-    showToast('Event deleted.');
-  };
-
-  // Photo gallery operations
-  const addPhotoCollection = (collectionData: Omit<PhotoCollection, 'id'>) => {
-    const newCollection: PhotoCollection = {
-      ...collectionData,
-      id: 'album-' + Date.now()
-    };
-    setPhotoCollections((prev) => [newCollection, ...prev]);
-    showToast('Photo album uploaded!');
-  };
-
-  const updatePhotoCollection = (collection: PhotoCollection) => {
-    setPhotoCollections((prev) => prev.map((col) => (col.id === collection.id ? collection : col)));
-    showToast('Gallery album updated!');
-  };
-
-  const deletePhotoCollection = (id: string) => {
-    setPhotoCollections((prev) => prev.filter((col) => col.id !== id));
-    showToast('Photo album deleted.');
-  };
-
-  // Announcement operations
-  const addAnnouncement = (annData: Omit<Announcement, 'id'>) => {
+  // Announcement operations with Cloud Firestore
+  const addAnnouncement = async (annData: Omit<Announcement, 'id'>) => {
+    const newId = 'ann-' + Date.now();
     const newAnn: Announcement = {
       ...annData,
-      id: 'ann-' + Date.now()
+      id: newId
     };
     setAnnouncements((prev) => [newAnn, ...prev]);
     showToast('Announcement published!');
+
+    try {
+      await setDoc(doc(db, 'announcements', newId), newAnn);
+      showToast('☁️ Notice published to Google Firestore!');
+    } catch (err) {
+      console.error('Firestore addAnnouncement error:', err);
+    }
   };
 
-  const updateAnnouncement = (ann: Announcement) => {
+  const updateAnnouncement = async (ann: Announcement) => {
     setAnnouncements((prev) => prev.map((a) => (a.id === ann.id ? ann : a)));
     showToast('Announcement updated!');
+
+    try {
+      await setDoc(doc(db, 'announcements', ann.id), ann);
+    } catch (err) {
+      console.error('Firestore updateAnnouncement error:', err);
+    }
   };
 
-  const deleteAnnouncement = (id: string) => {
+  const deleteAnnouncement = async (id: string) => {
     setAnnouncements((prev) => prev.filter((a) => a.id !== id));
     showToast('Announcement deleted.');
+
+    try {
+      await deleteDoc(doc(db, 'announcements', id));
+    } catch (err) {
+      console.error('Firestore deleteAnnouncement error:', err);
+    }
   };
 
-  // Accounting operations (Admin only)
-  const addTransaction = (trxData: Omit<AccountingTransaction, 'id' | 'createdAt'>) => {
-    if (!isAdmin) {
-      showToast('Permission denied: Admin role required for accounting');
-      return;
-    }
-    const newTrx: AccountingTransaction = {
-      ...trxData,
-      id: 'acc-' + Date.now(),
+  // Community Posts / Acche Vichar CRUD
+  const addPost = async (postData: Omit<CommunityPost, 'id' | 'createdAt'>) => {
+    const newId = 'post-' + Date.now();
+    const newPost: CommunityPost = {
+      ...postData,
+      id: newId,
       createdAt: new Date().toISOString()
     };
-    setTransactions((prev) => [newTrx, ...prev]);
-    showToast(`${trxData.type === 'income' ? 'Income' : 'Expense'} entry recorded!`);
+    setPosts((prev) => [newPost, ...prev]);
+    showToast('पोस्ट सफलतापूर्वक प्रकाशित हो गई!');
+
+    try {
+      await setDoc(doc(db, 'posts', newId), newPost);
+      showToast('☁️ Post synced to Google Firestore!');
+    } catch (err) {
+      console.error('Firestore addPost error:', err);
+    }
   };
 
-  const updateTransaction = (trx: AccountingTransaction) => {
-    if (!isAdmin) return;
-    setTransactions((prev) => prev.map((t) => (t.id === trx.id ? trx : t)));
-    showToast('Transaction updated!');
+  const updatePost = async (post: CommunityPost) => {
+    setPosts((prev) => prev.map((p) => (p.id === post.id ? post : p)));
+    showToast('पोस्ट अपडेट हो गई!');
+
+    try {
+      await setDoc(doc(db, 'posts', post.id), post);
+    } catch (err) {
+      console.error('Firestore updatePost error:', err);
+    }
   };
 
-  const deleteTransaction = (id: string) => {
-    if (!isAdmin) return;
+  const deletePost = async (id: string) => {
+    setPosts((prev) => prev.filter((p) => p.id !== id));
+    showToast('पोस्ट हटा दी गई.');
+
+    try {
+      await deleteDoc(doc(db, 'posts', id));
+    } catch (err) {
+      console.error('Firestore deletePost error:', err);
+    }
+  };
+
+  const likePost = async (id: string) => {
+    const target = posts.find((p) => p.id === id);
+    if (!target) return;
+    const updatedPost = { ...target, likesCount: (target.likesCount || 0) + 1 };
+    setPosts((prev) => prev.map((p) => (p.id === id ? updatedPost : p)));
+
+    try {
+      await setDoc(doc(db, 'posts', id), updatedPost);
+    } catch (err) {
+      console.error('Firestore likePost error:', err);
+    }
+  };
+
+  // Accounting Transactions (Admin Only) CRUD
+  const addTransaction = async (txData: Omit<AccountingTransaction, 'id' | 'createdAt'>) => {
+    const newId = 'acc-' + Date.now();
+    const newTx: AccountingTransaction = {
+      ...txData,
+      id: newId,
+      createdAt: new Date().toISOString()
+    };
+    setTransactions((prev) => [newTx, ...prev]);
+    showToast('लेखा-जोखा (Transaction) सफलतापूर्वक दर्ज किया गया!');
+
+    try {
+      await setDoc(doc(db, 'transactions', newId), newTx);
+      showToast('☁️ Transaction saved in Firestore!');
+    } catch (err) {
+      console.error('Firestore addTransaction error:', err);
+    }
+  };
+
+  const updateTransaction = async (tx: AccountingTransaction) => {
+    setTransactions((prev) => prev.map((t) => (t.id === tx.id ? tx : t)));
+    showToast('लेनदेन विवरण अपडेट हो गया!');
+
+    try {
+      await setDoc(doc(db, 'transactions', tx.id), tx);
+    } catch (err) {
+      console.error('Firestore updateTransaction error:', err);
+    }
+  };
+
+  const deleteTransaction = async (id: string) => {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
-    showToast('Transaction removed.');
+    showToast('लेनदेन रिकॉर्ड हटा दिया गया.');
+
+    try {
+      await deleteDoc(doc(db, 'transactions', id));
+    } catch (err) {
+      console.error('Firestore deleteTransaction error:', err);
+    }
   };
 
-  const resetToDefaults = () => {
+  const resetToDefaults = async () => {
+    if (typeof window !== 'undefined') {
+      const confirmReset = window.confirm(
+        'चेतावनी (Warning): क्या आप वाकई सारा डेटा मूल डिफ़ॉल्ट पर रीसेट करना चाहते हैं? आपके द्वारा किए गए सभी कस्टम बदलाव मिट जाएंगे।'
+      );
+      if (!confirmReset) return;
+    }
     setCeremonies(INITIAL_SUNDERKAND_CEREMONIES);
     setBhajans(INITIAL_BHAJANS);
-    setEvents(INITIAL_MANDAL_EVENTS);
-    setPhotoCollections(INITIAL_PHOTO_COLLECTIONS);
     setAnnouncements(INITIAL_ANNOUNCEMENTS);
-    setTransactions(INITIAL_ACCOUNTING_TRANSACTIONS);
-    showToast('Mandal data reset to authentic defaults.');
+    setPosts(INITIAL_POSTS);
+    setTransactions(INITIAL_TRANSACTIONS);
+
+    try {
+      // Sync defaults to Cloud Firestore
+      const batch = writeBatch(db);
+      INITIAL_SUNDERKAND_CEREMONIES.forEach((c) => {
+        batch.set(doc(db, 'ceremonies', c.id), c);
+      });
+      INITIAL_BHAJANS.forEach((b) => {
+        batch.set(doc(db, 'bhajans', b.id), b);
+      });
+      INITIAL_ANNOUNCEMENTS.forEach((a) => {
+        batch.set(doc(db, 'announcements', a.id), a);
+      });
+      INITIAL_POSTS.forEach((p) => {
+        batch.set(doc(db, 'posts', p.id), p);
+      });
+      INITIAL_TRANSACTIONS.forEach((t) => {
+        batch.set(doc(db, 'transactions', t.id), t);
+      });
+      await batch.commit();
+      showToast('Mandal data reset to authentic defaults in Cloud Firestore.');
+    } catch (err) {
+      console.error('Reset batch commit error:', err);
+      showToast('Mandal data reset locally.');
+    }
+  };
+
+  // Export full application state as downloadable JSON backup
+  const exportAllData = () => {
+    try {
+      const backupPayload = {
+        mandal: 'SHREE KASHTBHANJAN PREMI, Nougama, Banswara',
+        exportedAt: new Date().toISOString(),
+        version: '3.0 (Firebase Firestore Cloud Sync)',
+        data: {
+          ceremonies,
+          bhajans,
+          announcements,
+          posts,
+          transactions
+        }
+      };
+
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupPayload, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute(
+        'download',
+        `Kashtabhanjan_Premi_Cloud_Backup_${new Date().toISOString().split('T')[0]}.json`
+      );
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('डेटा बैकअप फ़ाइल सफलतापूर्वक डाउनलोड हो गई!');
+    } catch (err) {
+      console.error('Export error', err);
+      showToast('बैकअप डाउनलोड करने में त्रुटि हुई');
+    }
+  };
+
+  // Import JSON backup and apply immediately to both local and Firestore
+  const importAllData = async (jsonData: string): Promise<boolean> => {
+    try {
+      const parsed = JSON.parse(jsonData);
+      const payload = parsed.data || parsed;
+
+      const batch = writeBatch(db);
+
+      if (payload.ceremonies && Array.isArray(payload.ceremonies)) {
+        setCeremonies(payload.ceremonies);
+        localStorage.setItem(STORAGE_KEYS.CEREMONIES, JSON.stringify(payload.ceremonies));
+        payload.ceremonies.forEach((c: SunderkandCeremony) => {
+          if (c.id) batch.set(doc(db, 'ceremonies', c.id), c);
+        });
+      }
+      if (payload.bhajans && Array.isArray(payload.bhajans)) {
+        setBhajans(payload.bhajans);
+        localStorage.setItem(STORAGE_KEYS.BHAJANS, JSON.stringify(payload.bhajans));
+        payload.bhajans.forEach((b: Bhajan) => {
+          if (b.id) batch.set(doc(db, 'bhajans', b.id), b);
+        });
+      }
+      if (payload.announcements && Array.isArray(payload.announcements)) {
+        setAnnouncements(payload.announcements);
+        localStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify(payload.announcements));
+        payload.announcements.forEach((a: Announcement) => {
+          if (a.id) batch.set(doc(db, 'announcements', a.id), a);
+        });
+      }
+      if (payload.posts && Array.isArray(payload.posts)) {
+        setPosts(payload.posts);
+        localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(payload.posts));
+        payload.posts.forEach((p: CommunityPost) => {
+          if (p.id) batch.set(doc(db, 'posts', p.id), p);
+        });
+      }
+      if (payload.transactions && Array.isArray(payload.transactions)) {
+        setTransactions(payload.transactions);
+        localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(payload.transactions));
+        payload.transactions.forEach((t: AccountingTransaction) => {
+          if (t.id) batch.set(doc(db, 'transactions', t.id), t);
+        });
+      }
+
+      await batch.commit();
+      showToast('बैकअप डेटा Google Firebase Firestore पर सिंक और सुरक्षित हो गया!');
+      return true;
+    } catch (err) {
+      console.error('Import parse error', err);
+      showToast('अमान्य बैकअप फ़ाइल (Invalid backup JSON)');
+      return false;
+    }
   };
 
   return (
@@ -395,18 +718,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addBhajan,
         updateBhajan,
         deleteBhajan,
-        events,
-        addEvent,
-        updateEvent,
-        deleteEvent,
-        photoCollections,
-        addPhotoCollection,
-        updatePhotoCollection,
-        deletePhotoCollection,
         announcements,
         addAnnouncement,
         updateAnnouncement,
         deleteAnnouncement,
+        posts,
+        addPost,
+        updatePost,
+        deletePost,
+        likePost,
         transactions,
         addTransaction,
         updateTransaction,
@@ -415,7 +735,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setSearchQuery,
         toastMessage,
         showToast,
-        resetToDefaults
+        isCloudSynced,
+        resetToDefaults,
+        exportAllData,
+        importAllData
       }}
     >
       {children}
